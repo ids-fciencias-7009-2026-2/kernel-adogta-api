@@ -3,6 +3,8 @@ package com.kernel.crew.sys.adogta.domain
 data class Usuario(
     val id: Long,
     val nombre: String,
+    val apellidoPaterno: String,
+    val apellidoMaterno: String,
     val email: String,
     val codigoPostal: String,
     val telefono: String?,

@@ -2,6 +2,8 @@ package com.kernel.crew.sys.adogta.dto.request
 
 data class RegisterRequest(
     val nombre: String,
+    val apellidoPaterno: String,
+    val apellidoMaterno: String,
     val email: String,
     val codigoPostal: String,
     val telefono: String?,

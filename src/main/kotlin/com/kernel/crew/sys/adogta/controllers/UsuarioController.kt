@@ -26,6 +26,8 @@ class UsuarioController {
     private val usuarioFake = Usuario(
         id = 1L,
         nombre = "admin",
+        apellidoPaterno = "howard",
+        apellidoMaterno = "benson",
         email = "admin@adogta.com",
         codigoPostal = "06600",
         telefono = "5512345678",
@@ -81,6 +83,8 @@ class UsuarioController {
         logger.info("PUT /usuarios - ${request.email}")
         val usuarioActualizado = usuarioFake.copy(
             nombre = request.nombre,
+            apellidoPaterno = request.apellidoPaterno,
+            apellidoMaterno = request.apellidoMaterno,
             email = request.email,
             telefono = request.telefono,
             codigoPostal = request.codigoPostal
