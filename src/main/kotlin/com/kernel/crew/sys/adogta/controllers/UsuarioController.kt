@@ -27,7 +27,23 @@ class UsuarioController {
         id = 1L,
         nombre = "admin",
         email = "admin@adogta.com",
-        password = "password"
+        codigoPostal = "06600",
+        telefono = "5512345678",
+        password = "1234",
+        googleId = null,
+        authProvider = "local",
+        rol = "admin",
+        emailVerificado = true,
+        isBaned = false,
+        banMotive = null,
+        banDate = null,
+        bannedBy = null,
+        reputation = 100,
+        aceptaTerminos = true,
+        fechaAceptaTerminos = "2026-01-01",
+        fechaRegistro = "2026-01-01",
+        ultimoAcceso = "2026-02-23",
+        fechaUpdate = "2026-02-23"
     )
 
     @GetMapping("/me")
@@ -65,7 +81,9 @@ class UsuarioController {
         logger.info("PUT /usuarios - ${request.email}")
         val usuarioActualizado = usuarioFake.copy(
             nombre = request.nombre,
-            email = request.email
+            email = request.email,
+            telefono = request.telefono,
+            codigoPostal = request.codigoPostal
         )
         return ResponseEntity.ok(usuarioActualizado.toResponse())
     }
