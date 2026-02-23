@@ -8,6 +8,8 @@ fun RegisterRequest.toDomain(): Usuario {
     return Usuario(
         id = 1L,
         nombre = this.nombre,
+        apellidoPaterno = this.apellidoPaterno,
+        apellidoMaterno = this.apellidoMaterno,
         email = this.email,
         codigoPostal = this.codigoPostal,
         telefono = this.telefono,
@@ -33,6 +35,8 @@ fun Usuario.toResponse(): UsuarioResponse {
     return UsuarioResponse(
         id = this.id,
         nombre = this.nombre,
+        apellidoPaterno = this.apellidoPaterno,
+        apellidoMaterno = this.apellidoMaterno,
         email = this.email,
         codigoPostal = this.codigoPostal,
         telefono = this.telefono,
