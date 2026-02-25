@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.security.MessageDigest
+import java.util.UUID
 
 
 @RestController
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController
 class UsuarioController {
 
     private val logger = LoggerFactory.getLogger(UsuarioController::class.java)
+    private val activeTokens = mutableSetOf<String>()
 
     private val usuarioFake = Usuario(
         id = 1L,
@@ -49,8 +53,11 @@ class UsuarioController {
     )
 
     @GetMapping("/me")
-    fun getMe(): ResponseEntity<UsuarioResponse> {
+    fun getMe(@RequestHeader("Authorization", required = false) token: String?): ResponseEntity<UsuarioResponse> {
         logger.info("GET /usuarios/me")
+        if (token == null || !activeTokens.contains(token)) {
+            return ResponseEntity.status(401).build()
+        }
         return ResponseEntity.ok(usuarioFake.toResponse())
     }
 
@@ -64,8 +71,15 @@ class UsuarioController {
     @PostMapping("/login")
     fun login(@RequestBody request: LoginRequest): ResponseEntity<Any> {
         logger.info("POST /usuarios/login - ${request.email}")
-        return if (request.email == usuarioFake.email && request.password == usuarioFake.password) {
-            ResponseEntity.ok(mapOf("mensaje" to "Login exitoso", "token" to "fake-token-123"))
+
+        val passwordHash = hashPassword(request.password)
+        val usuarioFakeHash = hashPassword(usuarioFake.password!!)
+
+        return if (request.email == usuarioFake.email && passwordHash == usuarioFakeHash) {
+            val token = tokenGenerator()
+            activeTokens.add(token)
+            logger.info("Login exitoso, token generado: $token")
+            ResponseEntity.ok(mapOf("token" to token))
         } else {
             logger.warn("Login fallido para ${request.email}")
             ResponseEntity.status(401).body(mapOf("error" to "Credenciales incorrectas"))
@@ -73,14 +87,26 @@ class UsuarioController {
     }
 
     @PostMapping("/logout")
-    fun logout(): ResponseEntity<Any> {
-        logger.info("POST /usuarios/logout")
+    fun logout(@RequestHeader("Authorization") token: String): ResponseEntity<Any> {
+        logger.info("POST /usuarios/logout - token: $token")
+
+        activeTokens.remove(token)
+        logger.info("Token eliminado: $token")
+
         return ResponseEntity.ok(mapOf("mensaje" to "Sesión cerrada correctamente"))
     }
 
     @PutMapping
-    fun update(@RequestBody request: UpdateUsuarioRequest): ResponseEntity<UsuarioResponse> {
+    fun update(
+        @RequestHeader("Authorization", required = false) token: String?,
+        @RequestBody request: UpdateUsuarioRequest
+    ): ResponseEntity<Any> {
         logger.info("PUT /usuarios - ${request.email}")
+
+        if (token == null || !activeTokens.contains(token)) {
+            return ResponseEntity.status(401).build()
+        }
+
         val usuarioActualizado = usuarioFake.copy(
             nombre = request.nombre,
             apellidoPaterno = request.apellidoPaterno,
@@ -91,4 +117,16 @@ class UsuarioController {
         )
         return ResponseEntity.ok(usuarioActualizado.toResponse())
     }
+
+    private fun hashPassword(password: String): String {
+        val bytes = MessageDigest
+            .getInstance("SHA-256")
+            .digest(password.toByteArray())
+        return bytes.joinToString("") { "%02x".format(it) }
+    }
+
+    private fun tokenGenerator(): String {
+        return UUID.randomUUID().toString()
+    }
+
 }
