@@ -1,4 +1,4 @@
-# Plataforma de Adopción de Perros y Gatos: Adojta.
+# Plataforma de Adopción de Perros y Gatos: Adogta.
 El proyecto consiste en el desarrollo de una plataforma web diseñada para facilitar la adopción responsable de perros y gatos, conectando a personas que desean dar en adopción animales con aquellas interesadas en adoptar.
 
 
