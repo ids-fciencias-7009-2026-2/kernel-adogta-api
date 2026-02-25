@@ -4,6 +4,21 @@ import com.kernel.crew.sys.adogta.domain.Usuario
 import com.kernel.crew.sys.adogta.dto.request.RegisterRequest
 import com.kernel.crew.sys.adogta.dto.response.UsuarioResponse
 
+/**
+ * Extension functions para conversión entre capas del sistema.
+ *
+ * Permiten transformar objetos entre la capa de transporte (DTOs)
+ * y la capa de dominio, manteniendo separadas las responsabilidades.
+ */
+
+/**
+ * Convierte un [RegisterRequest] en un objeto de dominio [Usuario].
+ *
+ * Asigna valores default correspondientes a un usuario recién registrado:
+ * rol "usuario", reputación 0, email no verificado, sin baneo.
+ *
+ * Nota: id y las fechas son simulados hasta integrar base de datos.
+ */
 fun RegisterRequest.toDomain(): Usuario {
     return Usuario(
         id = 1L,
@@ -31,6 +46,12 @@ fun RegisterRequest.toDomain(): Usuario {
     )
 }
 
+/**
+ * Convierte un objeto de dominio [Usuario] en un [UsuarioResponse].
+ *
+ * Excluye campos sensibles como password, googleId, tokens
+ * y datos internos de auditoría.
+ */
 fun Usuario.toResponse(): UsuarioResponse {
     return UsuarioResponse(
         id = this.id,
