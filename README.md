@@ -11,3 +11,17 @@ Vease el [video de las pruebas en Postman](https://drive.google.com/file/d/1TSaA
 ## Práctica 2.
 
 Durante esta práctica se desarrollaron los ajustes al archivo domain para que concuerde con la estructura de la base de datos además de crear la conexión con la misma.
+
+Para ejecutar la base de datos se tienen los siguientes comandos:
+
+```bash
+   docker run --name Nombre -e POSTGRES_USER=Usuario -e POSTGRES_PASSWORD=badpassword -p 5432:5432 -d postgres
+```
+
+Además agregar al .env local:
+
+```bash
+   URL_DB=localhost:5432/Nombre
+   USER_DB=Usuario
+   PASSWORD_DB=badpassword
+```
