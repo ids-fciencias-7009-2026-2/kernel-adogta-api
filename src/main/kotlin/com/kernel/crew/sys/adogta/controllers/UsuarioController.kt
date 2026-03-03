@@ -25,7 +25,7 @@ import java.util.UUID
  * Manja las operaciones de registro, autenticación, consulta y actualización
  * de usuarios bajo la ruta base '/usuarios'.
  *
- * La utenticación es simulada en memoria. No se utiliza base de datos
+ * La autenticación es simulada en memoria. No se utiliza base de datos
  * ni un proveedor de identidad real en esta versión.
  */
 @RestController
@@ -35,7 +35,7 @@ class UsuarioController {
     private val logger = LoggerFactory.getLogger(UsuarioController::class.java)
 
     /**
-     * Conjunto de tokens activos generador tras un login exitoso.
+     * Conjunto de tokens activos y generador tras un login exitoso.
      * Se utiliza para validar el acceso a endpoints protegidos.
      */
     private val activeTokens = mutableSetOf<String>()
@@ -46,27 +46,23 @@ class UsuarioController {
      */
     private val usuarioFake = Usuario(
         id = 1L,
-        nombre = "admin",
+        nombres = "admin",
         apellidoPaterno = "howard",
         apellidoMaterno = "benson",
         email = "admin@adogta.com",
         codigoPostal = "06600",
         telefono = "5512345678",
-        password = "1234",
         googleId = null,
-        authProvider = "local",
-        rol = "admin",
-        emailVerificado = true,
-        isBaned = false,
-        banMotive = null,
-        banDate = null,
-        bannedBy = null,
-        reputation = 100,
+        contrasena = "1234",
         aceptaTerminos = true,
         fechaAceptaTerminos = "2026-01-01",
-        fechaRegistro = "2026-01-01",
-        ultimoAcceso = "2026-02-23",
-        fechaUpdate = "2026-02-23"
+        proveedorAutenticacion = "local",
+        tokenSesion = "c653ad1b-cf04-4fbb-aa8d-f44ba03a3e73",
+        fechaExpiracionSesion = "2026-02-23",
+        tokenRecuperacionContrasena = "2026-02-23",
+        fechaExpiracionTokenRecuperacion = "2026-02-23",
+        esAdoptante = true,
+        esDonante = false
     )
 
     /**
@@ -108,7 +104,7 @@ class UsuarioController {
     }
 
     /**
-     * Autentica a un usuario mediante email y contraseña.
+     * Auténtica a un usuario mediante email y contraseña.
      *
      * Compara las credenciales recibidas contra el usuario simulado [usuarioFake],
      * aplicando hash SHA-256 a ambas contraseñas antes de compararlas.
@@ -124,7 +120,7 @@ class UsuarioController {
         logger.info("POST /usuarios/login - ${request.email}")
 
         val passwordHash = hashPassword(request.password)
-        val usuarioFakeHash = hashPassword(usuarioFake.password!!)
+        val usuarioFakeHash = hashPassword(usuarioFake.contrasena!!)
 
         return if (request.email == usuarioFake.email && passwordHash == usuarioFakeHash) {
             val token = tokenGenerator()
@@ -183,7 +179,7 @@ class UsuarioController {
         }
 
         val usuarioActualizado = usuarioFake.copy(
-            nombre = request.nombre,
+            nombres = request.nombres,
             apellidoPaterno = request.apellidoPaterno,
             apellidoMaterno = request.apellidoMaterno,
             email = request.email,

@@ -20,7 +20,7 @@ data class UpdateUsuarioRequest(
     /**
      * Nombre(s) actualizado del usuario.
      * */
-    val nombre: String,
+    val nombres: String,
 
     /**
      * Primer apellido actualizado del usuario.

@@ -24,7 +24,7 @@ data class RegisterRequest(
     /**
      * Nombre(s) del usuario.
      * */
-    val nombre: String,
+    val nombres: String,
 
     /**
      * Primer apellido del usuario.
@@ -54,7 +54,7 @@ data class RegisterRequest(
     /**
      * Contraseña en texto plano. Null si el proveedor es Google.
      * */
-    val password: String?,
+    val contrasena: String?,
 
     /**
      *  Identificador de cuenta Google. Null si el proveedor es local.
@@ -64,7 +64,7 @@ data class RegisterRequest(
     /**
      *  Proveedor de autenticación: "local" o "google".
      *  */
-    val authProvider: String,
+    val proveedorAutenticacion: String,
 
     /**
      * Indica si el usuario aceptó los términos y condiciones.

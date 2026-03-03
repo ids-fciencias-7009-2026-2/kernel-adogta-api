@@ -1,5 +1,7 @@
 package com.kernel.crew.sys.adogta.domain
 
+import com.kernel.crew.sys.adogta.dto.request.RegisterRequest
+
 /**
  * Modelo de dominio que representa a un Usuario dentro del sistema Adogta.
  *
@@ -15,7 +17,7 @@ data class Usuario(
     /**
      * Nombre(s) del usuario.
      * */
-    val nombre: String,
+    val nombres: String,
 
     /**
      * Primer apellido del usuario.
@@ -23,9 +25,9 @@ data class Usuario(
     val apellidoPaterno: String,
 
     /**
-     * Segundo apellido del usuario.
+     * Segundo apellido del usuario. Opcional.
      * */
-    val apellidoMaterno: String,
+    val apellidoMaterno: String?,
 
     /**
      * Correo electrónico único del usuario.
@@ -33,19 +35,14 @@ data class Usuario(
     val email: String,
 
     /**
-     * Código postal del usuario.
+     * Código postal del usuario. Exactamente 5 dígitos.
      * */
     val codigoPostal: String,
 
     /**
-     *  Número telefónico del usuario. Opcional.
-     *  */
-    val telefono: String?,
-
-    /**
-     * Contraseña hasheada. Null si el proveedor de autenticación es Google.
+     * Número telefónico del usuario.
      * */
-    val password: String?,
+    val telefono: String?,
 
     /**
      * Identificador de cuenta Google. Null si el proveedor es local.
@@ -53,44 +50,9 @@ data class Usuario(
     val googleId: String?,
 
     /**
-     * Proveedor de autenticación: "local" o "google".
+     * Contraseña hasheada. Null si el proveedor de autenticación es Google.
      * */
-    val authProvider: String,
-
-    /**
-     * Rol del usuario en el sistema: "usuario" o "admin".
-     * */
-    val rol: String,
-
-    /**
-     * Indica si el correo electrónico fue verificado.
-     * */
-    val emailVerificado: Boolean,
-
-    /**
-     * Indica si el usuario está baneado del sistema.
-     * */
-    val isBaned: Boolean,
-
-    /**
-     * Motivo del baneo. Null si el usuario no está baneado.
-     * */
-    val banMotive: String?,
-
-    /**
-     * Fecha del baneo. Null si el usuario no está baneado.
-     * */
-    val banDate: String?,
-
-    /**
-     * ID del administrador que aplicó el baneo. Null si no aplica.
-     * */
-    val bannedBy: Long?,
-
-    /**
-     * Puntuación de reputación del usuario. Default 0.
-     * */
-    val reputation: Int,
+    val contrasena: String?,
 
     /**
      * Indica si el usuario aceptó los términos y condiciones.
@@ -98,22 +60,42 @@ data class Usuario(
     val aceptaTerminos: Boolean,
 
     /**
-     * Fecha en que se aceptaron los términos. Null si no aplica.
+     * Fecha en que se aceptaron los términos.
      * */
     val fechaAceptaTerminos: String?,
 
     /**
-     * Fecha de registro en el sistema.
+     * Proveedor de autenticación: "local" o "google".
      * */
-    val fechaRegistro: String,
+    val proveedorAutenticacion: String,
 
     /**
-     * Fecha del último acceso. Se actualiza en cada login.
+     * Token de sesión activo del usuario.
      * */
-    val ultimoAcceso: String,
+    val tokenSesion: String?,
 
     /**
-     * Fecha de la última modificación del perfil.
+     * Fecha de expiración del token de sesión.
      * */
-    val fechaUpdate: String
+    val fechaExpiracionSesion: String?,
+
+    /**
+     * Token para recuperación de contraseña.
+     * */
+    val tokenRecuperacionContrasena: String?,
+
+    /**
+     * Fecha de expiración del token de recuperación.
+     * */
+    val fechaExpiracionTokenRecuperacion: String?,
+
+    /**
+     * Indica si el usuario tiene perfil de adoptante.
+     * */
+    val esAdoptante: Boolean,
+
+    /**
+     * Indica si el usuario tiene perfil de donante.
+     * */
+    val esDonante: Boolean
 )

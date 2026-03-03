@@ -1,5 +1,7 @@
 package com.kernel.crew.sys.adogta.dto.response
 
+import com.kernel.crew.sys.adogta.dto.request.RegisterRequest
+
 /**
  * DTO que representa la respuesta con información del usuario.
  *
@@ -16,7 +18,7 @@ data class UsuarioResponse(
     /**
      * Nombre(s) del usuario.
      * */
-    val nombre: String,
+    val nombres: String,
 
     /**
      * Primer apellido del usuario.
@@ -26,7 +28,7 @@ data class UsuarioResponse(
     /**
      * Segundo apellido del usuario.
      * */
-    val apellidoMaterno: String,
+    val apellidoMaterno: String?,
 
     /**
      * Correo electrónico del usuario.
@@ -46,40 +48,11 @@ data class UsuarioResponse(
     /**
      * Proveedor de autenticación: "local" o "google".
      * */
-    val authProvider: String,
+    val proveedorAutenticacion: String,
 
-    /**
-     * Rol del usuario en el sistema: "usuario" o "admin".
-     * */
-    val rol: String,
-
-    /**
-     * Indica si el correo electrónico fue verificado.
-     * */
-    val emailVerificado: Boolean,
-
-    /**
-     * Indica si el usuario está baneado del sistema.
-     * */
-    val isBaned: Boolean,
-
-    /**
-     * Puntuación de reputación del usuario.
-     * */
-    val reputation: Int,
 
     /**
      * Indica si el usuario aceptó los términos y condiciones.
      * */
     val aceptaTerminos: Boolean,
-
-    /**
-     * Fecha de registro en el sistema.
-     * */
-    val fechaRegistro: String,
-
-    /**
-     * Fecha del último acceso.
-     * */
-    val ultimoAcceso: String
 )
