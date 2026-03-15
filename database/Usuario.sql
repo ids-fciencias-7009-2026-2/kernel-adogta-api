@@ -1,5 +1,5 @@
 --Tabla usuario
-CREATE TABLE usuario (
+CREATE TABLE Usuario (
     id_usuario SERIAL PRIMARY KEY,
     nombres VARCHAR(100) NOT NULL,
     apellido_paterno VARCHAR(100) NOT NULL,
