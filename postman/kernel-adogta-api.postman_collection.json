@@ -1,215 +1,180 @@
 {
-	"info": {
-		"_postman_id": "a9e6bd65-63bb-4735-a03e-50225cb5c073",
-		"name": "kernel-adogta-api",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "52677677",
-		"_collection_link": "https://kernel-crew-y-la-sonora-santanera.postman.co/workspace/Kernel-crew-y-la-sonora-santane~07744bc1-2db8-4a71-83de-68ed30eeebaa/collection/24800783-a9e6bd65-63bb-4735-a03e-50225cb5c073?action=share&source=collection_link&creator=52677677"
-	},
-	"item": [
-		{
-			"name": "Usuarios",
-			"item": [
-				{
-					"name": "/me - sin token",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8080/usuarios/me",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"usuarios",
-								"me"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/login - exitoso",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"admin@adogta.com\",\n    \"password\": \"1234\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/usuarios/login",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"usuarios",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/me - con token",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "6bdab5ed-ef5d-42a3-871f-c2ad8b417b5a",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/usuarios/me",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"usuarios",
-								"me"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/logout",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "dc177797-8b93-4669-b95c-60a676a6b2f0",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/usuarios/logout",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"usuarios",
-								"logout"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/register",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"nombre\": \"Ana\",\n    \"apellidoPaterno\": \"López\",\n    \"apellidoMaterno\": \"García\",\n    \"email\": \"ana@adogta.com\",\n    \"codigoPostal\": \"06600\",\n    \"telefono\": \"5512345678\",\n    \"password\": \"segura123\",\n    \"googleId\": null,\n    \"authProvider\": \"local\",\n    \"aceptaTerminos\": true\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/usuarios/register",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"usuarios",
-								"register"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/usuarios - con token",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "6bdab5ed-ef5d-42a3-871f-c2ad8b417b5a",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"nombre\": \"Admin Actualizado\",\n    \"apellidoPaterno\": \"Howard\",\n    \"apellidoMaterno\": \"Benson\",\n    \"email\": \"nuevo@adogta.com\",\n    \"telefono\": \"5598765432\",\n    \"codigoPostal\": \"11800\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/usuarios",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"usuarios"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/usuarios - sin token",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "",
-								"value": "",
-								"type": "text",
-								"disabled": true
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"nombre\": \"Admin Actualizado\",\n    \"apellidoPaterno\": \"Howard\",\n    \"apellidoMaterno\": \"Benson\",\n    \"email\": \"nuevo@adogta.com\",\n    \"telefono\": \"5598765432\",\n    \"codigoPostal\": \"11800\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/usuarios",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"usuarios"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		}
-	]
+  "info": {
+    "_postman_id": "a9e6bd65-63bb-4735-a03e-50225cb5c073",
+    "name": "kernel-adogta-api",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "24800783",
+    "_collection_link": "https://go.postman.co/collection/24800783-a9e6bd65-63bb-4735-a03e-50225cb5c073?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Login - Credenciales Correctas",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@adogta.com\",\n    \"password\": \"1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/usuarios/login",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "usuarios",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Me - Token válido",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "b92f688e-1f25-4833-bace-9a1fcd1645d2",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/usuarios/me",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "usuarios",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update - Actualizar perfil",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "b92f688e-1f25-4833-bace-9a1fcd1645d2",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nombres\": \"Admin Actualizado\",\n    \"apellidoPaterno\": \"Howard\",\n    \"apellidoMaterno\": \"Benson\",\n    \"email\": \"admin@adogta.com\",\n    \"telefono\": \"5598765432\",\n    \"codigoPostal\": \"11800\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/usuarios",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout - Cerrar sesión",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "b92f688e-1f25-4833-bace-9a1fcd1645d2",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/usuarios/logout",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "usuarios",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Me con token inválido",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "b92f688e-1f25-4833-bace-9a1fcd1645d2",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "localhost:8080/usuarios/me",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "usuarios",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register - Nuevo usuario",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nombres\": \"Ana\",\n    \"apellidoPaterno\": \"López\",\n    \"apellidoMaterno\": \"García\",\n    \"email\": \"ana@adogta.com\",\n    \"codigoPostal\": \"06600\",\n    \"telefono\": \"5512345678\",\n    \"contrasena\": \"segura123\",\n    \"googleId\": null,\n    \"proveedorAutenticacion\": \"local\",\n    \"aceptaTerminos\": true,\n    \"esAdoptante\": true,\n    \"esDonante\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "localhost:8080/usuarios/register",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "usuarios",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
 }
