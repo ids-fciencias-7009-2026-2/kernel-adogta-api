@@ -71,7 +71,7 @@ data class RegisterRequest(
     /**
      * Indica si el usuario aceptó los términos y condiciones.
      * */
-    val aceptaTerminos: Boolean
+    val aceptaTerminos: Boolean,
 
     /**
      * Indica si el usuario se registra como adoptante.
