@@ -7,16 +7,18 @@ package com.kernel.crew.sys.adogta.dto.request
  *
  * Ejemplo de body:
  * {
- *   "nombre": "Ana",
+ *   "nombres": "Ana",
  *   "apellidoPaterno": "López",
  *   "apellidoMaterno": "García",
  *   "email": "ana@adogta.com",
- *   "códigoPostal": "06600",
- *   "teléfono": "5512345678",
- *   "password": "segura123",
+ *   "codigoPostal": "06600",
+ *   "telefono": "5512345678",
+ *   "contraseña": "segura123",
  *   "googleId": null,
- *   "authProvider": "local",
- *   "aceptaTérminos": true
+ *   "proveedorAutenticacion": "local",
+ *   "aceptaTerminos": true,
+ *   "esAdoptante": true,
+ *   "esDonante": false
  * }
  */
 data class RegisterRequest(
@@ -70,4 +72,14 @@ data class RegisterRequest(
      * Indica si el usuario aceptó los términos y condiciones.
      * */
     val aceptaTerminos: Boolean
+
+    /**
+     * Indica si el usuario se registra como adoptante.
+     * */
+    val esAdoptante: Boolean,
+
+    /**
+     * Indica si el usuario se registra como donante
+     * */
+    val esDonante: Boolean
 )
