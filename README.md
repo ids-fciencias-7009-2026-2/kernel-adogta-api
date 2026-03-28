@@ -25,3 +25,78 @@ Además agregar al .env local:
    USER_DB=Usuario
    PASSWORD_DB=badpassword
 ```
+
+## Práctica 3.
+ 
+Durante esta práctica se entrega el modelo de base de datos completo que se desarrolló, incluyendo el diagrama entidad-relación (ER) y los scripts SQL necesarios para construir y poblar la base de datos.
+ 
+### Construcción de la Base de Datos
+ 
+Para construir la base de datos desde cero, sigue estos pasos en orden:
+ 
+#### 1. Conectarse a la Base de Datos
+ 
+Primero, asegúrate de que tu contenedor de PostgreSQL esté en ejecución y conéctate a la base de datos:
+ 
+```bash
+docker exec -it Nombre psql -U Usuario -d postgres
+```
+ 
+O si prefieres usar un cliente gráfico como pgAdmin o DBeaver, utiliza las credenciales configuradas previamente.
+ 
+#### 2. Ejecutar el DDL (Data Definition Language)
+ 
+El archivo `DDL.sql` contiene la definición de la estructura de la base de datos (tablas, relaciones, constraints, índices).
+ 
+**Desde psql (dentro del contenedor):**
+```sql
+\i /ruta/al/archivo/DDL.sql
+```
+ 
+**Desde línea de comandos (fuera del contenedor):**
+```bash
+docker exec -i Nombre psql -U Usuario -d postgres < DDL.sql
+```
+
+#### 3. Cargar Datos de Prueba con el DML (Data Manipulation Language)
+ 
+El archivo `DML.sql` contiene datos de prueba, incluyendo un usuario.
+ 
+**Desde psql (dentro del contenedor):**
+```sql
+\i /ruta/al/archivo/DML.sql
+```
+ 
+**Desde línea de comandos (fuera del contenedor):**
+```bash
+docker exec -i Nombre psql -U Usuario -d postgres < DML.sql
+```
+
+#### 4. Verificar la Instalación con Queries de Prueba
+ 
+El archivo `Querys.sql` contiene consultas de verificación para asegurar que la base de datos se haya construido correctamente.
+ 
+**Desde psql (dentro del contenedor):**
+```sql
+\i /ruta/al/archivo/Querys.sql
+```
+ 
+**Desde línea de comandos (fuera del contenedor):**
+```bash
+docker exec -i Nombre psql -U Usuario -d postgres < Querys.sql
+```
+ 
+### Credenciales del Usuario de Prueba
+ 
+Una vez ejecutado el DML, tendrás disponible el siguiente usuario para pruebas:
+ 
+- **Email:** admin@adogta.com
+- **Contraseña:** 1234
+- **Roles:** Adoptante y Donante
+ 
+### Diagrama Entidad-Relación
+ 
+El diagrama ER completo del sistema se encuentra en los archivos:
+- `AdogtaER.svg` - Versión vectorial (recomendada)
+- `AdogtaER.png` - Versión imagen
+ 
