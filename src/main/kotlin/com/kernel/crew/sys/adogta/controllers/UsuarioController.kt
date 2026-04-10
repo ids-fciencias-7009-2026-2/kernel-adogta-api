@@ -96,8 +96,12 @@ class UsuarioController {
      * @return 200 con un mensaje de confirmación de cierre de sesión.
      */
     @PostMapping("/logout")
-    fun logout(@RequestHeader("Authorization") token: String): ResponseEntity<Any> {
+    fun logout(@RequestHeader("Authorization", required = false) token: String?): ResponseEntity<Any> {
         logger.info("POST /usuarios/logout - token: $token")
+
+        if (token == null) {
+            return ResponseEntity.status(400).body(mapOf("mensaje" to "Nada que hacer"))
+        }
 
         usuarioService.logout(token)
         return ResponseEntity.ok(mapOf("mensaje" to "Sesión cerrada correctamente"))
