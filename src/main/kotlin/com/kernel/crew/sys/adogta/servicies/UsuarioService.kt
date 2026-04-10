@@ -1,4 +1,4 @@
-package com.kernel.crew.sys.adogta.services
+package com.kernel.crew.sys.adogta.servicies
 
 import com.kernel.crew.sys.adogta.dto.request.LoginRequest
 import com.kernel.crew.sys.adogta.dto.request.RegisterRequest
@@ -48,8 +48,14 @@ class UsuarioService {
      * @param request Datos del nuevo usuario a registrar.
      * @return [UsuarioResponse] del usuario recién creado.
      */
-    fun register(request: RegisterRequest): UsuarioResponse {
+    fun register(request: RegisterRequest): UsuarioResponse? {
         logger.info("Registrando nuevo usuario: ${request.email}")
+
+        if (usuarioRepository.findByEmail(request.email) != null) {
+            logger.warn("Intento de registro con correo ya existente: ${request.email}")
+            return null
+        }
+
         val entity = request.toEntity()
         val saved = usuarioRepository.save(entity)
         return saved.toDomain().toResponse()

@@ -4,7 +4,7 @@ import com.kernel.crew.sys.adogta.dto.request.LoginRequest
 import com.kernel.crew.sys.adogta.dto.request.RegisterRequest
 import com.kernel.crew.sys.adogta.dto.request.UpdateUsuarioRequest
 import com.kernel.crew.sys.adogta.dto.response.UsuarioResponse
-import com.kernel.crew.sys.adogta.services.UsuarioService
+import com.kernel.crew.sys.adogta.servicies.UsuarioService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -63,10 +63,12 @@ class UsuarioController {
      * @return 201 con el [UsuarioResponse] del usuario recién creado.
      */
     @PostMapping("/register")
-    fun register(@RequestBody request: RegisterRequest): ResponseEntity<UsuarioResponse> {
+    fun register(@RequestBody request: RegisterRequest): ResponseEntity<Any> {
         logger.info("POST /usuarios/register - ${request.email}")
 
         val nuevoUsuario = usuarioService.register(request)
+            ?: return ResponseEntity.status(409).body(mapOf("error" to "El correo ya está registrado"))
+
         return ResponseEntity.status(201).body(nuevoUsuario)
     }
 
