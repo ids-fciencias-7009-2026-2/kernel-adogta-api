@@ -37,7 +37,7 @@ class SmtpEmailService(
      * @param token        Token de recuperación.
      */
     override fun enviarCorreoRecuperacion(destinatario: String, token: String) {
-        val enlace = "$baseUrl/usuarios/reset-password?token=$token"
+        val enlace = "$baseUrl/reset-password?token=$token"
 
         // Construir el contexto para la plantilla Thymeleaf
         val context = Context().apply {
