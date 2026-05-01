@@ -24,4 +24,10 @@ interface UsuarioRepository : JpaRepository<UsuarioEntity, Long> {
      * Se usa en endpoints protegidos para validar el token del header Authorization.
      */
     fun findByTokenSesion(tokenSesion: String): UsuarioEntity?
+
+    /**
+     * Busca un usuario por su token de recuperación de contraseña
+     * Se usa en concretamente para el caso de solicitud de recuperación.
+     */
+    fun findByTokenRecuperacionContrasena(token: String): UsuarioEntity?
 }

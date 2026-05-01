@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperación de contraseña</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td align="center">
+                <table width="500" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <tr>
+                        <td style="background-color: #F4A26C; padding: 20px; text-align: center;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Adogta</h1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 30px;">
+                            <h2 style="color: #333333; font-size: 20px;">Restablece tu contraseña</h2>
+                            <p style="color: #555555; font-size: 16px; line-height: 1.5;">
+                                Hola,<br><br>
+                                Hemos recibido una solicitud para restablecer la contraseña de tu cuenta en <strong>Adogta</strong>.
+                                Haz clic en el botón de abajo para crear una nueva contraseña:
+                            </p>
+                            <table cellpadding="0" cellspacing="0" style="margin: 25px 0;">
+                                <tr>
+                                    <td align="center" bgcolor="#F4A26C" style="border-radius: 4px;">
+                                        <a th:href="${enlace}" target="_blank" style="display: inline-block; padding: 12px 30px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: bold;">
+                                            Restablecer contraseña
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p style="color: #888888; font-size: 12px;">
+                                Si no solicitaste este cambio, puedes ignorar este mensaje y tu contraseña permanecerá igual.
+                            </p>
+                            <p style="color: #888888; font-size: 12px;">Este enlace expirará en 1 hora.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 12px; color: #aaaaaa;">
+                            &copy; 2026 Adogta. Todos los derechos reservados.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

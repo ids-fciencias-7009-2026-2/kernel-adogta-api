@@ -32,5 +32,12 @@ fun main(args: Array<String>) {
 	System.setProperty("USER_DB", dotenv["USER_DB"])
 	System.setProperty("PASSWORD_DB", dotenv["PASSWORD_DB"])
 
+	System.setProperty("MAIL_HOST", dotenv["MAIL_HOST"])
+    System.setProperty("MAIL_PORT", dotenv["MAIL_PORT"])
+    System.setProperty("MAIL_USERNAME", dotenv["MAIL_USERNAME"])
+    System.setProperty("MAIL_PASSWORD", dotenv["MAIL_PASSWORD"])
+    System.setProperty("APP_BASE_URL", dotenv["APP_BASE_URL"])
+
+
 	runApplication<AdogtaApplication>(*args)
 }

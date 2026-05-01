@@ -9,6 +9,9 @@ import com.kernel.crew.sys.adogta.extensions.toDomain
 import com.kernel.crew.sys.adogta.extensions.toEntity
 import com.kernel.crew.sys.adogta.extensions.toResponse
 import com.kernel.crew.sys.adogta.repositories.UsuarioRepository
+import com.kernel.crew.sys.adogta.dto.request.ForgotPasswordRequest
+import com.kernel.crew.sys.adogta.dto.request.ResetPasswordRequest
+import com.kernel.crew.sys.adogta.dto.response.MessageResponse
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -32,6 +35,9 @@ class UsuarioService {
 
     @Autowired
     lateinit var usuarioRepository: UsuarioRepository
+
+    @Autowired
+    lateinit var emailService: EmailService
 
     /**
      * Duración de la sesión deslizante en horas.
@@ -148,6 +154,87 @@ class UsuarioService {
         )
         val saved = usuarioRepository.save(actualizado)
         return saved.toDomain().toResponse()
+    }
+
+    /**
+     * Inicia el proceso de recuperación de contraseña para un usuario dado su correo electrónico.
+     *
+     * Genera un token (UUIDv4), lo almacena en la base de datos con una expiración de 1 hora
+     * y envía un correo electrónico al usuario con un enlace que incluye el token.
+     *
+     * Siempre responde con un mensaje genérico, independientemente de si el correo existe en la plataforma.
+     *
+     * @param request DTO que contiene el correo electrónico del usuario que solicita la recuperación.
+     * @return [MessageResponse] con un mensaje para el cliente.
+     */
+    fun solicitarRecuperacion(request: ForgotPasswordRequest): MessageResponse {
+        logger.info("Solicitud de recuperación de contraseña para: ${request.email}")
+
+        val usuario = usuarioRepository.findByEmail(request.email)
+
+        if (usuario == null) {
+            logger.info("No se encontró usuario con el correo ${request.email}, respondiendo mensaje genérico")
+            return MessageResponse(
+                "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña."
+            )
+        }
+
+        val token = UUID.randomUUID().toString()
+        val expiracion = LocalDateTime.now().plusHours(1)
+
+        val actualizado = usuario.copy(
+            tokenRecuperacionContrasena = token,
+            fechaExpiracionTokenRecuperacion = expiracion
+        )
+        usuarioRepository.save(actualizado)
+
+        emailService.enviarCorreoRecuperacion(usuario.email, token)
+        logger.info("Token de recuperación generado y correo enviado a ${usuario.email}")
+
+        return MessageResponse(
+            "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña."
+        )
+    }
+
+    /**
+     * Restablece la contraseña de un usuario utilizando un token de recuperación válido.
+     *
+     * Valida que el token exista en la base de datos y que no haya expirado. Si el token es válido,
+     * hashea la nueva contraseña, la almacena, limpia los campos relacionados con la recuperación 
+     * e invalida cualquier sesión activa del usuario.
+     *
+     * @param request DTO que contiene el token de recuperación y la nueva contraseña en texto plano.
+     * @return [MessageResponse] con la confirmación del cambio exitoso.
+     * @throws IllegalArgumentException si el token es inválido.
+     */
+    fun restablecerContrasena(request: ResetPasswordRequest): MessageResponse {
+        logger.info("Intento de restablecimiento de contraseña con token proporcionado")
+
+        val usuario = usuarioRepository.findByTokenRecuperacionContrasena(request.token)
+            ?: throw IllegalArgumentException("Token inválido o ya utilizado.")
+
+        // Verificar que el token no haya expirado
+        val expiracion = usuario.fechaExpiracionTokenRecuperacion
+        if (expiracion == null || LocalDateTime.now().isAfter(expiracion)) {
+            logger.warn("Token de recuperación expirado para el usuario ${usuario.email}")
+            throw IllegalArgumentException("El token ha expirado. Solicita uno nuevo.")
+        }
+
+        // Hashear la nueva contraseña.
+        val nuevoHash = hashPassword(request.newPassword)
+
+        // Actualizar usuario: nueva contraseña, limpiar token de recuperación e invalidar sesión activa
+        val actualizado = usuario.copy(
+            contrasena = nuevoHash,
+            tokenRecuperacionContrasena = null,
+            fechaExpiracionTokenRecuperacion = null,
+            tokenSesion = null,
+            fechaExpiracionSesion = null
+        )
+        usuarioRepository.save(actualizado)
+
+        logger.info("Contraseña restablecida exitosamente para el usuario ${usuario.email}")
+        return MessageResponse("Contraseña restablecida exitosamente. Inicia sesión con tu nueva contraseña.")
     }
 
     /**

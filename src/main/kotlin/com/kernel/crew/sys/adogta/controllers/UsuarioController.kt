@@ -5,6 +5,9 @@ import com.kernel.crew.sys.adogta.dto.request.RegisterRequest
 import com.kernel.crew.sys.adogta.dto.request.UpdateUsuarioRequest
 import com.kernel.crew.sys.adogta.dto.response.UsuarioResponse
 import com.kernel.crew.sys.adogta.servicies.UsuarioService
+import com.kernel.crew.sys.adogta.dto.request.ForgotPasswordRequest
+import com.kernel.crew.sys.adogta.dto.request.ResetPasswordRequest
+import com.kernel.crew.sys.adogta.dto.response.MessageResponse
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -132,5 +135,34 @@ class UsuarioController {
             ?: return ResponseEntity.status(401).build()
 
         return ResponseEntity.ok(usuarioActualizado)
+    }
+
+    /**
+     * Inicia el flujo de recuperación de contraseña.
+     * Envía un correo con un enlace si la cuenta existe.
+     * 
+     * @param request DTO con el correo electrónico del usuario.
+     * @return 200 OK con mensaje genérico.
+     */
+    @PostMapping("/forgot-password")
+    fun forgotPassword(@RequestBody request: ForgotPasswordRequest): ResponseEntity<MessageResponse> {
+        logger.info("POST /usuarios/forgot-password - ${request.email}")
+        return ResponseEntity.ok(usuarioService.solicitarRecuperacion(request))
+    }
+
+    /**
+     * Restablece la contraseña usando el token enviado por correo.
+     * 
+     * @param request DTO con el token de recuperación y la nueva contraseña.
+     * @return 200 OK si el cambio fue exitoso, 400 si el token es inválido o expiró.
+     */
+    @PostMapping("/reset-password")
+    fun resetPassword(@RequestBody request: ResetPasswordRequest): ResponseEntity<MessageResponse> {
+        logger.info("POST /usuarios/reset-password")
+        return try {
+            ResponseEntity.ok(usuarioService.restablecerContrasena(request))
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.badRequest().body(MessageResponse(e.message ?: "Solicitud inválida"))
+        }
     }
 }
