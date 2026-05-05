@@ -22,7 +22,7 @@ class AnimalService(
     @Transactional
     fun publicarAnimal(request: AnimalRequest): AnimalResponse {
 
-        val usuario = usuarioRepository.findById(request.usuarioId)
+        val usuario = usuarioRepository.findById(request.usuarioId.toLong())
             .orElseThrow { RuntimeException("Usuario no encontrado con id: ${request.usuarioId}") }
 
         val raza = razaRepository.findById(request.idRaza)
@@ -36,7 +36,7 @@ class AnimalService(
 
         val animalId = AnimalId(
             idPublicacion = publicacionGuardada.id!!,
-            idUsuario = usuario.id!!
+            idUsuario = usuario.id!!.toInt()
         )
 
         val nuevoAnimal = AnimalEntity(
@@ -51,11 +51,11 @@ class AnimalService(
             codigoPostal = request.codigoPostal,
             edad = request.edad,
             tipo = request.tipo,
-            raza = raza
-	    overrideEnergia = request.overrideEnergia,
-	    overrideIndependencia = request.overrideIndependencia,
-	    overrideSociableNiños = request.overrideSociableNiños,
-	    overrideSociableMascotas = request.overrideSociableMascotas
+            raza = raza,
+            overrideEnergia = request.overrideEnergia,
+            overrideIndependencia = request.overrideIndependencia,
+            overrideSociableNinos = request.overrideSociableNinos,
+            overrideSociableMascotas = request.overrideSociableMascotas
         )
 
         val animalGuardado = animalRepository.save(nuevoAnimal)
