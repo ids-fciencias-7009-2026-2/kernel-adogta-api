@@ -5,17 +5,21 @@ import jakarta.persistence.*
 @Entity
 @Table(name = "Animal")
 class AnimalEntity(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_animal")
-    val id: Int? = null,
+
+    @EmbeddedId
+    val id: AnimalId? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_publicacion", nullable = false)
+    @MapsId("idPublicacion")
+    @JoinColumns(
+        JoinColumn(name = "id_publicacion"),
+        JoinColumn(name = "id_usuario")
+    )
     val publicacion: PublicacionEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @MapsId("idUsuario")
+    @JoinColumn(name = "id_usuario", insertable = false, updatable = false)
     val usuario: UsuarioEntity,
 
     @Column(nullable = false, length = 100)
@@ -41,9 +45,8 @@ class AnimalEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_raza")
-    var raza: RazaEntity,
+    var raza: RazaEntity
 
-    // override para la personalidad
     @Column(name = "override_energia")
     var overrideEnergia: Int? = null,
 
