@@ -10,15 +10,13 @@ class AnimalEntity(
     val id: AnimalId? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("idPublicacion")
     @JoinColumns(
-        JoinColumn(name = "id_publicacion"),
-        JoinColumn(name = "id_usuario")
+        JoinColumn(name = "id_publicacion", insertable = false, updatable = false),
+        JoinColumn(name = "id_usuario", insertable = false, updatable = false)
     )
     val publicacion: PublicacionEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("idUsuario")
     @JoinColumn(name = "id_usuario", insertable = false, updatable = false)
     val usuario: UsuarioEntity,
 
@@ -45,7 +43,7 @@ class AnimalEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_raza")
-    var raza: RazaEntity
+    var raza: RazaEntity,
 
     @Column(name = "override_energia")
     var overrideEnergia: Int? = null,
@@ -53,8 +51,8 @@ class AnimalEntity(
     @Column(name = "override_independencia")
     var overrideIndependencia: Int? = null,
 
-    @Column(name = "override_sociable_niños")
-    var overrideSociableNiños: Int? = null,
+    @Column(name = "override_sociable_ninos")
+    var overrideSociableNinos: Int? = null,
 
     @Column(name = "override_sociable_mascotas")
     var overrideSociableMascotas: Int? = null
