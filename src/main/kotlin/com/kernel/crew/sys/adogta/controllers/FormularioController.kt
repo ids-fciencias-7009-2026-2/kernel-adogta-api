@@ -1,5 +1,8 @@
 package com.kernel.crew.sys.adogta.controllers
 
+import com.kernel.crew.sys.adogta.dto.request.FormularioRequest
+import com.kernel.crew.sys.adogta.dto.response.FormularioResponse
+import com.kernel.crew.sys.adogta.servicies.FormularioService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -28,13 +31,18 @@ import org.springframework.web.bind.annotation.RestController
     @Autowired
     lateinit var formularioService: FormularioService
 
+    /**
+     * Registra un nuevo usuario en el sistema.
+     *
+     * @param request Respuestas del formulario.
+     * @return 201 con el [FormularioResponse] del formulario recién creado.
+     */
     @PostMapping
-    fun guardarFormulario(@RequestBody request: FormularioRequest): ResponseEntity<FormularioResponse> {
+    fun guardarFormulario(@RequestBody request: FormularioRequest): ResponseEntity<Any> {
         logger.info("POST /formularios")
 
         val formularioGuardado = formularioService.guardarFormulario(request)
-        val response = formularioGuardado.toResponse()
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(formularioGuardado)
+        return ResponseEntity.status(201).body(formularioGuardado)
     }
 }

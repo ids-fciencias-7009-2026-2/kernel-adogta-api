@@ -1,7 +1,5 @@
 package com.kernel.crew.sys.adogta.dto.response
 
-import com.kernel.crew.sys.adogta.dto.request.RegisterRequest
-
 /**
  * DTO que representa la respuesta con información del formulario.
  */

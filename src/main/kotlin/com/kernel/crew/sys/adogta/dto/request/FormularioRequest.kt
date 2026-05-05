@@ -1,5 +1,7 @@
 package com.kernel.crew.sys.adogta.dto.request
 
+import com.kernel.crew.sys.adogta.entities.UsuarioEntity
+
 /**
  * DTO que representa el cuerpo de la petición de registro de un nuevo formulario.
  *
@@ -19,17 +21,22 @@ package com.kernel.crew.sys.adogta.dto.request
 
 
 data class FormularioRequest(
+    /** 
+     * Usuario que envía el formulario.
+     */
+    val usuario: UsuarioEntity,
+
     /**
      * Presupuesto del usuario.
      * */
 
-    val presupuesto: Integer,
+    val presupuesto: Int,
 
     /**
      * Si el usario tiene o no alergias.
      */
 
-    val tieneAlergias: Integer,
+    val tieneAlergias: Int,
 
     /**
      * Fecha en la que se envió el formulario.
@@ -41,23 +48,23 @@ data class FormularioRequest(
      * Si es usuario tiene o no mascotas.
      */
 
-    val tieneMascotas: Integer,
+    val tieneMascotas: Int,
 
     /**
      *El tiempo que el usuario pasa haciendo ejercicio.
      */
 
-    val tiempoEjercicio: Integer,
+    val tiempoEjercicio: Int,
 
     /**
      *El tiempo que la mascota estará sola.
      */
 
-    val tiempoSoledad: Integer,
+    val tiempoSoledad: Int,
 
     /**
      * Si el usuario tiene o no niños.
      */
 
-    val tieneNiños: Integer
+    val tieneNiños: Int
 )

@@ -5,6 +5,8 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import java.time.LocalDate
 
@@ -26,7 +28,7 @@ data class FormularioEntity(
 
 	@ManyToOne
     @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", nullable = false)
-    val usuario: UsuarioEntity,
+	val usuario: UsuarioEntity,
 
 	@Column(name = "presupuesto", nullable = false)
 	val presupuesto: Int = 0,
@@ -47,5 +49,5 @@ data class FormularioEntity(
 	val tiempoSoledad: Int = 0,
 
 	@Column(name = "tiene_niños", nullable = false)
-	val tieneNiños: Int = 0
+	val `tieneNiños`: Int = 0
 )
