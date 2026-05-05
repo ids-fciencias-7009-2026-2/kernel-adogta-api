@@ -3,33 +3,56 @@ package com.kernel.crew.sys.adogta.entities
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "animales") // tabla de bdd
+@Table(name = "Animal")
 class AnimalEntity(
-    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null, // PK
+    @Column(name = "id_animal")
+    val id: Int? = null,
 
-    @Column(nullable = false)
-    var nombre: String, // nombre del animal
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_publicacion", nullable = false)
+    val publicacion: PublicacionEntity,
 
-    @Column(nullable = false)
-    var especie: String, // Perro o gato
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario", nullable = false)
+    val usuario: UsuarioEntity,
 
-    @Column(nullable = false)
-    var edad: String, // edad de animal
+    @Column(nullable = false, length = 100)
+    var nombre: String,
 
-    @Column(nullable = false)
-    var tamano: String, // pequeño, mediano o grande
+    @Column(name = "estado_vacunacion", length = 50)
+    var estadoVacunacion: String,
+
+    var esterilizado: Boolean,
 
     @Column(columnDefinition = "TEXT")
-    var descripcion: String, // descripcion o cosas importantes qué destacas
+    var descripcion: String,
 
-    @Column(name = "foto_url")
-    var fotoUrl: String? = null,
- 
-    // publicador
+    var entrenado: Boolean,
+
+    @Column(name = "codigo_postal", length = 10)
+    var codigoPostal: String,
+
+    var edad: Int,
+
+    @Column(length = 6)
+    var tipo: String,
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id", nullable = false)
-    var publicador: UsuarioEntity
+    @JoinColumn(name = "id_raza")
+    var raza: RazaEntity,
+
+    // override para la personalidad
+    @Column(name = "override_energia")
+    var overrideEnergia: Int? = null,
+
+    @Column(name = "override_independencia")
+    var overrideIndependencia: Int? = null,
+
+    @Column(name = "override_sociable_niños")
+    var overrideSociableNiños: Int? = null,
+
+    @Column(name = "override_sociable_mascotas")
+    var overrideSociableMascotas: Int? = null
 )
