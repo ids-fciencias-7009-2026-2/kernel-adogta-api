@@ -130,6 +130,21 @@ class UsuarioService {
     }
 
     /**
+     * Retorna el usuario autenticado correspondiente al token recibido como una entidad.
+     *
+     * Valída que el token exista y que la sesión no haya expirado.
+     * Si la sesión es válida, renueva la fecha de expiración deslizante.
+     *
+     * @param token Token de sesión enviado en el header Authorization.
+     * @return [UsuarioEntity] del usuario autenticado, o null si el token es inválido o expiró.
+     */
+
+    fun getAsEntity(token: String): UsuarioEntity? {
+        val usuario = validarYRenovarSesion(token) ?: return null
+        return usuario
+    }
+
+    /**
      * Actualiza los datos del perfil del usuario autenticado.
      *
      * Valída el token antes de aplicar los cambios. Si la sesión es válida,

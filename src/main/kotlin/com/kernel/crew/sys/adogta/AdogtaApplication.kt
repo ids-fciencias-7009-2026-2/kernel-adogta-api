@@ -15,7 +15,7 @@ class AdogtaApplication {
 		return object : WebMvcConfigurer {
 			override fun addCorsMappings(registry: CorsRegistry) {
 				registry.addMapping("/**")
-					.allowedOrigins("http://localhost:5173")  // Frontend
+					.allowedOrigins("http://localhost:5432")  // Frontend
 					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 					.allowedHeaders("*")
 					.allowCredentials(true)
