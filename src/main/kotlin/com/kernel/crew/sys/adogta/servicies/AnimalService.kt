@@ -5,6 +5,7 @@ import com.kernel.crew.sys.adogta.dto.response.AnimalResponse
 import com.kernel.crew.sys.adogta.entities.AnimalEntity
 import com.kernel.crew.sys.adogta.entities.AnimalId
 import com.kernel.crew.sys.adogta.entities.PublicacionEntity
+import com.kernel.crew.sys.adogta.entities.PublicacionId
 import com.kernel.crew.sys.adogta.repositories.AnimalRepository
 import com.kernel.crew.sys.adogta.repositories.PublicacionRepository
 import com.kernel.crew.sys.adogta.repositories.RazaRepository
@@ -17,25 +18,29 @@ class AnimalService(
     private val animalRepository: AnimalRepository,
     private val publicacionRepository: PublicacionRepository,
     private val razaRepository: RazaRepository,
-    private val usuarioRepository: UsuarioRepository
+    private val usuarioRepository: UsuarioRepository,
+    private val usuarioService: UsuarioService
 ) {
     @Transactional
-    fun publicarAnimal(request: AnimalRequest): AnimalResponse {
+    fun publicarAnimal(token: String, request: AnimalRequest): AnimalResponse? {
 
-        val usuario = usuarioRepository.findById(request.usuarioId.toLong())
-            .orElseThrow { RuntimeException("Usuario no encontrado con id: ${request.usuarioId}") }
+        val usuarioAutenticado = usuarioService.getMe(token) ?: return null
+
+        val usuario = usuarioRepository.findById(usuarioAutenticado.id)
+            .orElseThrow { RuntimeException("Usuario no encontrado con id: ${usuarioAutenticado.id}") }
 
         val raza = razaRepository.findById(request.idRaza)
             .orElseThrow { RuntimeException("Raza no encontrada con id: ${request.idRaza}") }
 
         val nuevaPublicacion = PublicacionEntity(
+            id = PublicacionId(idUsuario = usuario.id!!.toInt()),
             usuario = usuario,
             estado = "Activa"
         )
         val publicacionGuardada = publicacionRepository.save(nuevaPublicacion)
 
         val animalId = AnimalId(
-            idPublicacion = publicacionGuardada.id!!,
+            idPublicacion = publicacionGuardada.id!!.idPublicacion,
             idUsuario = usuario.id!!.toInt()
         )
 
@@ -54,15 +59,17 @@ class AnimalService(
             raza = raza,
             overrideEnergia = request.overrideEnergia,
             overrideIndependencia = request.overrideIndependencia,
-            overrideSociableNinos = request.overrideSociableNinos,
-            overrideSociableMascotas = request.overrideSociableMascotas
+            overrideSociableNiños = request.overrideSociableNiños,
+            overrideSociableMascotas = request.overrideSociableMascotas,
+            padecimientos = request.padecimientos.toMutableSet(),
+            fotos = request.fotos.toMutableSet()
         )
 
         val animalGuardado = animalRepository.save(nuevoAnimal)
 
         return AnimalResponse(
             idAnimal = animalGuardado.id?.idAnimal,
-            idPublicacion = publicacionGuardada.id,
+            idPublicacion = publicacionGuardada.id?.idPublicacion,
             nombre = animalGuardado.nombre
         )
     }

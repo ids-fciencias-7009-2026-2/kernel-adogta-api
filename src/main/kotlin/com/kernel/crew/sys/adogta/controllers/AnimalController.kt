@@ -8,20 +8,22 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/animales")
-@CrossOrigin(origins = ["*"])
+@CrossOrigin(origins = ["http://localhost:5173"])
 class AnimalController(
     private val animalService: AnimalService
 ) {
 
-    // ruta final
     @PostMapping("/publicar")
-    fun publicarAnimal(@RequestBody request: AnimalRequest): ResponseEntity<Any> {
+    fun publicarAnimal(
+        @RequestHeader("Authorization", required = false) token: String?,
+        @RequestBody request: AnimalRequest
+    ): ResponseEntity<Any> {
+        if (token == null) return ResponseEntity.status(401).build()
         return try {
-            val nuevoAnimal = animalService.publicarAnimal(request)
-            // Si todo sale bien, regresa un estado con "¡Creado exitosamente!" y los datos del animal
+            val nuevoAnimal = animalService.publicarAnimal(token, request)
+                ?: return ResponseEntity.status(401).build()
             ResponseEntity.status(HttpStatus.CREATED).body(nuevoAnimal)
         } catch (e: Exception) {
-	    // Si no, lanzamos error
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to e.message))
         }
     }
