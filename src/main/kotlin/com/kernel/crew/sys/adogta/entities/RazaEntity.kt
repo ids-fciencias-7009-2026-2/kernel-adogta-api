@@ -11,6 +11,8 @@ class RazaEntity(
     @Column(name = "id_raza")
     val id: Int? = null,
 
+    val nombre: String,
+
     val talla: Int,
 
     val independencia: Int,

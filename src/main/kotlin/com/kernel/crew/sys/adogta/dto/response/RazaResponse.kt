@@ -4,6 +4,7 @@ import com.kernel.crew.sys.adogta.entities.RazaEntity
 
 data class RazaResponse(
     val idRaza: Int,
+    val nombre: String,
     val talla: Int,
     val independencia: Int,
     val nivelEnergia: Int,
@@ -15,6 +16,7 @@ data class RazaResponse(
     companion object {
         fun from(raza: RazaEntity): RazaResponse = RazaResponse(
             idRaza = raza.id ?: 0,
+            nombre = raza.nombre,
             talla = raza.talla,
             independencia = raza.independencia,
             nivelEnergia = raza.nivelEnergia,
