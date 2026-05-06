@@ -3,15 +3,14 @@ package com.kernel.crew.sys.adogta.entities
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "Publicacion")
+@Table(name = "publicacion")
 class PublicacionEntity(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_publicacion")
-    val id: Int? = null,
+
+    @EmbeddedId
+    val id: PublicacionId? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @JoinColumn(name = "id_usuario", insertable = false, updatable = false)
     val usuario: UsuarioEntity,
 
     @Column(length = 50)
