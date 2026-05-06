@@ -11,8 +11,8 @@ class AnimalEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(
-        JoinColumn(name = "id_publicacion", insertable = false, updatable = false),
-        JoinColumn(name = "id_usuario", insertable = false, updatable = false)
+        JoinColumn(name = "id_publicacion", referencedColumnName = "id_publicacion", insertable = false, updatable = false),
+        JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", insertable = false, updatable = false)
     )
     val publicacion: PublicacionEntity,
 
@@ -51,9 +51,33 @@ class AnimalEntity(
     @Column(name = "override_independencia")
     var overrideIndependencia: Int? = null,
 
-    @Column(name = "override_sociable_ninos")
-    var overrideSociableNinos: Int? = null,
+    @Column(name = "override_sociable_niños")
+    var overrideSociableNiños: Int? = null,
 
     @Column(name = "override_sociable_mascotas")
-    var overrideSociableMascotas: Int? = null
+    var overrideSociableMascotas: Int? = null,
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+        name = "padecimientos",
+        joinColumns = [
+            JoinColumn(name = "id_animal", referencedColumnName = "id_animal"),
+            JoinColumn(name = "id_publicacion", referencedColumnName = "id_publicacion"),
+            JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
+        ]
+    )
+    @Column(name = "padecimiento", length = 100)
+    var padecimientos: MutableSet<String> = mutableSetOf(),
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+        name = "fotos",
+        joinColumns = [
+            JoinColumn(name = "id_animal", referencedColumnName = "id_animal"),
+            JoinColumn(name = "id_publicacion", referencedColumnName = "id_publicacion"),
+            JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
+        ]
+    )
+    @Column(name = "foto", length = 255)
+    var fotos: MutableSet<String> = mutableSetOf()
 )
