@@ -2,7 +2,10 @@ package com.kernel.crew.sys.adogta.servicies
 
 import com.kernel.crew.sys.adogta.dto.request.FormularioRequest
 import com.kernel.crew.sys.adogta.entities.FormularioEntity
+import com.kernel.crew.sys.adogta.entities.UsuarioEntity
 import com.kernel.crew.sys.adogta.repositories.FormularioRepository
+import com.kernel.crew.sys.adogta.repositories.UsuarioRepository
+import com.kernel.crew.sys.adogta.servicies.UsuarioService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -17,9 +20,13 @@ class FormularioService{
     @Autowired
     lateinit var formularioRepository: FormularioRepository
 
-    fun guardarFormulario(request: FormularioRequest): FormularioEntity {
+    @Autowired
+    open lateinit var usuarioService: UsuarioService
+
+    fun guardarFormulario(request: FormularioRequest, token: String): FormularioEntity {
+        val usuarioEncontrado = usuarioService.getAsEntity(token)
         val nuevoFormulario = FormularioEntity(
-            usuario = request.usuario,
+            usuario = usuarioEncontrado,
             presupuesto = request.presupuesto,
             tieneAlergias = request.tieneAlergias,
             fechaEnvio = LocalDate.parse(request.fechaEnvio),

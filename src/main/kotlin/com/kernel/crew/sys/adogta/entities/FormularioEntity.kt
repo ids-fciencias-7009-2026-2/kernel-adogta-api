@@ -28,7 +28,7 @@ data class FormularioEntity(
 
 	@ManyToOne
     @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", nullable = false)
-	val usuario: UsuarioEntity,
+	val usuario: UsuarioEntity? = null,
 
 	@Column(name = "presupuesto", nullable = false)
 	val presupuesto: Int = 0,

@@ -37,11 +37,11 @@ import org.springframework.web.bind.annotation.RestController
      * @param request Respuestas del formulario.
      * @return 201 con el [FormularioResponse] del formulario recién creado.
      */
-    @PostMapping
-    fun guardarFormulario(@RequestBody request: FormularioRequest): ResponseEntity<Any> {
-        logger.info("POST /formularios")
+    @PostMapping("/guardar")
+    fun guardarFormulario(@RequestBody request: FormularioRequest, @RequestHeader("Authorization") token: String): ResponseEntity<Any> {
+        logger.info("POST /formularios/guardar")
 
-        val formularioGuardado = formularioService.guardarFormulario(request)
+        val formularioGuardado = formularioService.guardarFormulario(request, token)
 
         return ResponseEntity.status(201).body(formularioGuardado)
     }

@@ -13,7 +13,7 @@ package com.kernel.crew.sys.adogta.dto.request
  *   "email": "ana@adogta.com",
  *   "codigoPostal": "06600",
  *   "telefono": "5512345678",
- *   "contraseña": "segura123",
+ *   "contrasena": "segura123",
  *   "googleId": null,
  *   "proveedorAutenticacion": "local",
  *   "aceptaTerminos": true,

@@ -21,10 +21,6 @@ import com.kernel.crew.sys.adogta.entities.UsuarioEntity
 
 
 data class FormularioRequest(
-    /** 
-     * Usuario que envía el formulario.
-     */
-    val usuario: UsuarioEntity,
 
     /**
      * Presupuesto del usuario.
