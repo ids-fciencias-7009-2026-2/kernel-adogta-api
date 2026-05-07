@@ -219,6 +219,264 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "CU6 - Publicar animal",
+			"item": [
+				{
+					"name": "1. Login (guarda token)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('status 200', function () { pm.response.to.have.status(200); });",
+									"const json = pm.response.json();",
+									"const token = json.token || json.tokenSesion || json.sessionToken || (json.usuario && (json.usuario.token || json.usuario.tokenSesion));",
+									"pm.test('responde con token', function () { pm.expect(token, 'token en respuesta').to.be.a('string').and.not.empty; });",
+									"if (token) { pm.collectionVariables.set('token', token); console.log('token guardado:', token); }"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@adogta.com\",\n    \"password\": \"1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/usuarios/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"usuarios",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Publicar animal - happy path",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('status 201', function () { pm.response.to.have.status(201); });",
+									"const json = pm.response.json();",
+									"pm.test('responde con idAnimal', function () { pm.expect(json.idAnimal, 'idAnimal').to.be.a('number'); });",
+									"pm.test('responde con idPublicacion', function () { pm.expect(json.idPublicacion, 'idPublicacion').to.be.a('number'); });",
+									"pm.test('nombre coincide', function () { pm.expect(json.nombre).to.eql('Firulais'); });",
+									"if (json.idAnimal) pm.collectionVariables.set('idAnimalCreado', json.idAnimal);",
+									"if (json.idPublicacion) pm.collectionVariables.set('idPublicacionCreada', json.idPublicacion);",
+									"console.log('Verifica en BD: SELECT * FROM Animal WHERE id_animal = ' + json.idAnimal + ';');"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Firulais\",\n    \"tipo\": \"Perro\",\n    \"edad\": 3,\n    \"descripcion\": \"Perro juguetón y cariñoso, busca un hogar amoroso.\",\n    \"codigoPostal\": \"06600\",\n    \"estadoVacunacion\": \"Completo\",\n    \"esterilizado\": true,\n    \"entrenado\": false,\n    \"idRaza\": {{idRazaValida}},\n    \"overrideEnergia\": null,\n    \"overrideIndependencia\": null,\n    \"overrideSociableNiños\": null,\n    \"overrideSociableMascotas\": null,\n    \"padecimientos\": [],\n    \"fotos\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/animales/publicar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"animales",
+								"publicar"
+							]
+						},
+						"description": "Publica un animal autenticado. Requiere haber corrido '1. Login' primero para popular {{token}}.\n\nVerificación en BD (psql):\nSELECT a.id_animal, a.nombre, a.tipo, a.edad, p.estado\nFROM Animal a JOIN Publicacion p ON a.id_publicacion = p.id_publicacion\nORDER BY a.id_animal DESC LIMIT 5;"
+					},
+					"response": []
+				},
+				{
+					"name": "3. Publicar animal - sin token (401)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('status 401', function () { pm.response.to.have.status(401); });"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"SinToken\",\n    \"tipo\": \"Perro\",\n    \"edad\": 2,\n    \"descripcion\": \"prueba sin auth\",\n    \"codigoPostal\": \"06600\",\n    \"estadoVacunacion\": \"Completo\",\n    \"esterilizado\": false,\n    \"entrenado\": false,\n    \"idRaza\": {{idRazaValida}},\n    \"padecimientos\": [],\n    \"fotos\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/animales/publicar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"animales",
+								"publicar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. Publicar animal - token inválido (401)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('status 401', function () { pm.response.to.have.status(401); });"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "00000000-0000-0000-0000-000000000000",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"TokenInvalido\",\n    \"tipo\": \"Perro\",\n    \"edad\": 2,\n    \"descripcion\": \"prueba con token inválido\",\n    \"codigoPostal\": \"06600\",\n    \"estadoVacunacion\": \"Completo\",\n    \"esterilizado\": false,\n    \"entrenado\": false,\n    \"idRaza\": {{idRazaValida}},\n    \"padecimientos\": [],\n    \"fotos\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/animales/publicar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"animales",
+								"publicar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Publicar animal - raza inexistente (400)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('status 400', function () { pm.response.to.have.status(400); });",
+									"const json = pm.response.json();",
+									"pm.test('mensaje menciona raza', function () { pm.expect(JSON.stringify(json).toLowerCase()).to.include('raza'); });"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"RazaFantasma\",\n    \"tipo\": \"Perro\",\n    \"edad\": 2,\n    \"descripcion\": \"raza que no existe\",\n    \"codigoPostal\": \"06600\",\n    \"estadoVacunacion\": \"Completo\",\n    \"esterilizado\": false,\n    \"entrenado\": false,\n    \"idRaza\": 999999,\n    \"padecimientos\": [],\n    \"fotos\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/animales/publicar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"animales",
+								"publicar"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "idRazaValida",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "idAnimalCreado",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "idPublicacionCreada",
+			"value": "",
+			"type": "string"
 		}
 	]
 }
