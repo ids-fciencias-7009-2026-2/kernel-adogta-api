@@ -2,27 +2,58 @@ package com.kernel.crew.sys.adogta.controllers
 
 import com.kernel.crew.sys.adogta.dto.response.RazaResponse
 import com.kernel.crew.sys.adogta.repositories.RazaRepository
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Controlador REST que expone los endpoints relacionados con la entidad Raza.
+ *
+ * Maneja la consulta de razas disponibles en el sistema bajo la ruta base '/api/razas'.
+ *
+ * El acceso a datos está delegado a [RazaRepository].
+ * Este controlador solo recibe peticiones y devuelve respuestas.
+ */
 @RestController
 @RequestMapping("/api/razas")
-@CrossOrigin(origins = ["http://localhost:5173"])
-class RazaController(
-    private val razaRepository: RazaRepository
-) {
+class RazaController {
 
+    private val logger = LoggerFactory.getLogger(RazaController::class.java)
+
+    @Autowired
+    lateinit var razaRepository: RazaRepository
+
+    /**
+     * Retorna la lista completa de razas registradas en el sistema.
+     *
+     * @return 200 con la lista de [RazaResponse].
+     */
     @GetMapping
     fun listarRazas(): ResponseEntity<List<RazaResponse>> {
+        logger.info("GET /api/razas")
+
         val razas = razaRepository.findAll().map(RazaResponse::from)
         return ResponseEntity.ok(razas)
     }
 
+    /**
+     * Retorna la información de una raza específica por su ID.
+     *
+     * @param id Identificador numérico de la raza.
+     * @return 200 con el [RazaResponse] correspondiente,
+     *         o 404 si no existe una raza con ese ID.
+     */
     @GetMapping("/{id}")
     fun obtenerRaza(@PathVariable id: Int): ResponseEntity<Any> {
+        logger.info("GET /api/razas/$id")
+
         val raza = razaRepository.findById(id).orElse(null)
-            ?: return ResponseEntity.status(404)
-                .body(mapOf("error" to "Raza no encontrada con id: $id"))
+            ?: return ResponseEntity.status(404).body(mapOf("error" to "Raza no encontrada con id: $id"))
+
         return ResponseEntity.ok(RazaResponse.from(raza))
     }
 }

@@ -4,10 +4,26 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "Animal")
+@IdClass(AnimalId::class)
 class AnimalEntity(
 
-    @EmbeddedId
-    val id: AnimalId? = null,
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "animal_seq")
+    @SequenceGenerator(
+        name = "animal_seq",
+        sequenceName = "animal_id_animal_seq",
+        allocationSize = 1
+    )
+    @Column(name = "id_animal")
+    val idAnimal: Int = 0,
+
+    @Id
+    @Column(name = "id_publicacion")
+    val idPublicacion: Int = 0,
+
+    @Id
+    @Column(name = "id_usuario")
+    val idUsuario: Int = 0,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(
