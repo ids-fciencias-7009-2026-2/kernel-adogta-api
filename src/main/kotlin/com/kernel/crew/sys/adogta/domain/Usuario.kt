@@ -97,5 +97,10 @@ data class Usuario(
     /**
      * Indica si el usuario tiene perfil de donante.
      * */
-    val esDonante: Boolean
+    val esDonante: Boolean,
+
+    /**
+     * Indica si el usuario envió su formulario.
+     * */
+    val envioFormulario: Boolean
 )

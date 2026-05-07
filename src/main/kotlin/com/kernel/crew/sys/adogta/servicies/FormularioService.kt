@@ -22,6 +22,9 @@ class FormularioService{
     lateinit var formularioRepository: FormularioRepository
 
     @Autowired
+    lateinit var usuarioRepository: UsuarioRepository
+
+    @Autowired
     open lateinit var usuarioService: UsuarioService
 
     fun guardarFormulario(request: FormularioRequest, token: String): FormularioEntity {
@@ -36,6 +39,8 @@ class FormularioService{
             tiempoSoledad = request.tiempoSoledad.valor,
             tieneNiños = request.tieneNiños.valor
         )
+
+        usuarioRepository.updateCuestionarioStatus(token, true)
         
         return formularioRepository.save(nuevoFormulario)
     }

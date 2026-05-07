@@ -75,5 +75,8 @@ data class UsuarioEntity(
     val esAdoptante: Boolean = false,
 
     @Column(name = "es_donante", nullable = false)
-    val esDonante: Boolean = false
+    val esDonante: Boolean = false,
+
+    @Column(name = "envio_formulario", nullable = false)
+    val envioFormulario: Boolean = false
 )

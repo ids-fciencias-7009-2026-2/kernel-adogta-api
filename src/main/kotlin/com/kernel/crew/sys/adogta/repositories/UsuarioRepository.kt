@@ -2,7 +2,10 @@ package com.kernel.crew.sys.adogta.repositories
 
 import com.kernel.crew.sys.adogta.entities.UsuarioEntity
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Repositorio JPA para la entidad [UsuarioEntity].
@@ -30,4 +33,14 @@ interface UsuarioRepository : JpaRepository<UsuarioEntity, Long> {
      * Se usa en concretamente para el caso de solicitud de recuperación.
      */
     fun findByTokenRecuperacionContrasena(token: String): UsuarioEntity?
+
+    /**
+     * Se encarga de actualizar el atributo "envio_formulario"
+     * Se usa para saber si el usuario tiene que responder el cuestionario.
+     */
+    @Modifying
+    @Transactional
+    @Query("UPDATE usuario SET envio_formulario = :estado WHERE token_sesion = :token",
+        nativeQuery = true)
+    fun updateCuestionarioStatus(token: String, estado: Boolean): Int
 }
