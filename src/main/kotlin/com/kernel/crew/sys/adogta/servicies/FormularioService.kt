@@ -9,6 +9,7 @@ import com.kernel.crew.sys.adogta.servicies.UsuarioService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import com.kernel.crew.sys.adogta.enums.*
 
 /**
  * Servicio que contiene la lógica de negocio relacionada con la entidad Formulario.
@@ -27,13 +28,13 @@ class FormularioService{
         val usuarioEncontrado = usuarioService.getAsEntity(token)
         val nuevoFormulario = FormularioEntity(
             usuario = usuarioEncontrado,
-            presupuesto = request.presupuesto,
-            tieneAlergias = request.tieneAlergias,
+            presupuesto = request.presupuesto.valor,
+            tieneAlergias = request.tieneAlergias.valor,
             fechaEnvio = LocalDate.parse(request.fechaEnvio),
-            tieneMascotas = request.tieneMascotas,
-            tiempoEjercicio = request.tiempoEjercicio,
-            tiempoSoledad = request.tiempoSoledad,
-            tieneNiños = request.tieneNiños
+            tieneMascotas = request.tieneMascotas.valor,
+            tiempoEjercicio = request.tiempoEjercicio.valor,
+            tiempoSoledad = request.tiempoSoledad.valor,
+            tieneNiños = request.tieneNiños.valor
         )
         
         return formularioRepository.save(nuevoFormulario)
