@@ -1,6 +1,7 @@
 package com.kernel.crew.sys.adogta.controllers
 
 import com.kernel.crew.sys.adogta.servicies.UsuarioService
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -17,6 +18,8 @@ class UploadController(
     private val usuarioService: UsuarioService
 ) {
 
+    private val logger = LoggerFactory.getLogger(UploadController::class.java)
+
     private val uploadDir: Path = Paths.get("uploads").toAbsolutePath().also {
         Files.createDirectories(it)
     }
@@ -26,9 +29,17 @@ class UploadController(
         @RequestHeader("Authorization", required = false) token: String?,
         @RequestParam("file") file: MultipartFile
     ): ResponseEntity<Any> {
-        if (token == null) return ResponseEntity.status(401).build()
-        if (usuarioService.getMe(token) == null) return ResponseEntity.status(401).build()
+        logger.info("POST /api/upload - ${file.originalFilename ?: "(sin nombre)"}")
+        if (token == null) {
+            logger.warn("POST /api/upload sin token de sesión")
+            return ResponseEntity.status(401).build()
+        }
+        if (usuarioService.getMe(token) == null) {
+            logger.warn("POST /api/upload con token inválido o expirado")
+            return ResponseEntity.status(401).build()
+        }
         if (file.isEmpty) {
+            logger.warn("POST /api/upload con archivo vacío")
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to "Archivo vacío"))
         }
 
@@ -39,6 +50,7 @@ class UploadController(
         file.inputStream.use { Files.copy(it, target) }
 
         val url = "http://localhost:8080/uploads/$storedName"
+        logger.info("Archivo guardado: $storedName")
         return ResponseEntity.status(HttpStatus.CREATED).body(mapOf("url" to url))
     }
 }

@@ -9,10 +9,10 @@ class PublicacionEntity(
     @EmbeddedId
     val id: PublicacionId? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)//muchas publicaciones pueden ser de un mismo usuario
     @JoinColumn(name = "id_usuario", insertable = false, updatable = false)
     val usuario: UsuarioEntity,
 
     @Column(length = 50)
-    var estado: String = "Activa"
+    var estado: String = "Activa"				
 )
