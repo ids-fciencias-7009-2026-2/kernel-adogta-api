@@ -2,6 +2,7 @@ package com.kernel.crew.sys.adogta.controllers
 
 import com.kernel.crew.sys.adogta.dto.request.AnimalRequest
 import com.kernel.crew.sys.adogta.servicies.AnimalService
+import com.kernel.crew.sys.adogta.dto.request.AnimalUpdateRequest
 import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,6 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PutMapping
 
 /**
  * Controlador REST que expone los endpoints relacionados con la entidad Animal.
@@ -58,6 +63,91 @@ class AnimalController {
             ResponseEntity.status(HttpStatus.CREATED).body(nuevoAnimal)
         } catch (e: Exception) {
             logger.warn("Error al publicar animal: ${e.message}")
+            ResponseEntity.status(400).body(mapOf("error" to e.message))
+        }
+    }
+
+    /**
+     * Lista las publicaciones del usuario autenticado.
+     *
+     * @param token Token de sesión del usuario.
+     * @return 200 con lista de publicaciones, 401 si no hay token, 400 si hay error.
+     */
+    @GetMapping("/mis-publicaciones")
+    fun misPublicaciones(
+        @RequestHeader("Authorization", required = false) token: String?
+    ): ResponseEntity<Any> {
+        if (token == null) return ResponseEntity.status(401).build()
+        return try {
+            ResponseEntity.ok(animalService.listarMisPublicaciones(token))
+        } catch (e: Exception) {
+            ResponseEntity.status(400).body(mapOf("error" to e.message))
+        }
+    }
+
+    /**
+     * Obtiene los datos completos de un animal para su edición.
+     * Solo el dueño de la publicación puede acceder.
+     *
+     * @param token Token de sesión del usuario.
+     * @param idAnimal ID del animal a consultar.
+     * @return 200 con [AnimalDetailResponse], 401 si no hay token, 400 si hay error.
+     */
+    @GetMapping("/{idAnimal}/editar")
+    fun obtenerParaEditar(
+        @RequestHeader("Authorization", required = false) token: String?,
+        @PathVariable idAnimal: Int
+    ): ResponseEntity<Any> {
+        if (token == null) return ResponseEntity.status(401).build()
+        return try {
+            ResponseEntity.ok(animalService.obtenerAnimalParaEditar(token, idAnimal))
+        } catch (e: Exception) {
+            ResponseEntity.status(400).body(mapOf("error" to e.message))
+        }
+    }
+
+    /**
+     * Actualiza los datos de un animal de una publicación propia.
+     * Solo el dueño puede editar.
+     *
+     * @param token Token de sesión del usuario.
+     * @param idAnimal ID del animal a editar.
+     * @param request [AnimalUpdateRequest] con los campos a actualizar.
+     * @return 200 con mensaje e id, 401 si no hay token, 400 si hay error.
+     */
+    @PutMapping("/{idAnimal}")
+    fun editarAnimal(
+        @RequestHeader("Authorization", required = false) token: String?,
+        @PathVariable idAnimal: Int,
+        @Valid @RequestBody request: AnimalUpdateRequest
+    ): ResponseEntity<Any> {
+        if (token == null) return ResponseEntity.status(401).build()
+        return try {
+            val animal = animalService.editarAnimal(token, idAnimal, request)
+            ResponseEntity.ok(mapOf("mensaje" to "Animal actualizado", "idAnimal" to animal.idAnimal))
+        } catch (e: Exception) {
+            ResponseEntity.status(400).body(mapOf("error" to e.message))
+        }
+    }
+
+    /**
+     * Realiza el borrado lógico de una publicación cambiando su estado a "Borrada".
+     * Solo el dueño puede realizar esta acción.
+     *
+     * @param token Token de sesión del usuario.
+     * @param idPublicacion ID de la publicación a eliminar.
+     * @return 200 con mensaje de éxito, 401 si no hay token, 400 si hay error.
+     */
+    @DeleteMapping("/{idPublicacion}")
+    fun eliminarPublicacion(
+        @RequestHeader("Authorization", required = false) token: String?,
+        @PathVariable idPublicacion: Int
+    ): ResponseEntity<Any> {
+        if (token == null) return ResponseEntity.status(401).build()
+        return try {
+            animalService.cambiarEstadoPublicacion(token, idPublicacion, "Borrada")
+            ResponseEntity.ok(mapOf("mensaje" to "Publicación eliminada"))
+        } catch (e: Exception) {
             ResponseEntity.status(400).body(mapOf("error" to e.message))
         }
     }
