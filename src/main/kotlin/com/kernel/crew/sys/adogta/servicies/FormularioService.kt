@@ -49,4 +49,9 @@ class FormularioService{
         return formularioRepository.findAllByUsuarioId(idUsuario)
     }
 
+    fun obtenerFechaEnvioFormulario(token: String): LocalDate? {
+        val usuarioEncontrado = usuarioService.getAsEntity(token) ?: throw NoSuchElementException("No se encontró un usuario con ese token")
+        return formularioRepository.getFechaEnvioFormulario(usuarioEncontrado.id)
+    }
+
 }

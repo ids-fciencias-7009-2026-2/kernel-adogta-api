@@ -43,4 +43,5 @@ interface UsuarioRepository : JpaRepository<UsuarioEntity, Long> {
     @Query("UPDATE usuario SET envio_formulario = :estado WHERE token_sesion = :token",
         nativeQuery = true)
     fun updateCuestionarioStatus(token: String, estado: Boolean): Int
+
 }
