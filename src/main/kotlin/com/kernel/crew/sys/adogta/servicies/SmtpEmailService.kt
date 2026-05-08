@@ -60,4 +60,49 @@ class SmtpEmailService(
         mailSender.send(mensaje)
         logger.info("Correo de recuperación enviado a $destinatario")
     }
+
+    /**
+     * Envía un correo al donante notificándole que un adoptante expresó interés
+     * en la publicación de su mascota.
+     *
+     * Si el envío falla:
+     * Spring lanzará una excepción org.springframework.mail.MailSendException
+     *
+     * @param destinatario      Correo electrónico del usuario donante.
+     * @param nombreAnimal      Nombre del animal publicado.
+     * @param nombreAdoptante   Nombre completo del adoptante.
+     * @param emailAdoptante    Correo electrónico del adoptante.
+     * @param telefonoAdoptante Teléfono del adoptante (puede ser nulo).
+     */
+    override fun enviarCorreoSolicitudAdopcion(
+        destinatario: String,
+        nombreAnimal: String,
+        nombreAdoptante: String,
+        emailAdoptante: String,
+        telefonoAdoptante: String?
+    ) {
+        // Construir el contexto para la plantilla Thymeleaf
+        val context = Context().apply {
+            setVariable("nombreAnimal", nombreAnimal)
+            setVariable("nombreAdoptante", nombreAdoptante)
+            setVariable("emailAdoptante", emailAdoptante)
+            setVariable("telefonoAdoptante", telefonoAdoptante)
+        }
+
+        // Procesar la plantilla HTML -> String
+        val contenidoHtml = templateEngine.process("email-solicitud-adopcion", context)
+
+        // Construir el mensaje
+        val mensaje: MimeMessage = mailSender.createMimeMessage()
+        val helper = MimeMessageHelper(mensaje, true, "UTF-8")
+
+        //contenido del correo.
+        helper.setTo(destinatario)
+        helper.setSubject("Nueva solicitud de adopción para $nombreAnimal - Adogta")
+        helper.setText(contenidoHtml, true)
+
+        // Se envia el correo.
+        mailSender.send(mensaje)
+        logger.info("Correo de solicitud de adopción enviado a $destinatario (animal: $nombreAnimal)")
+    }
 }
