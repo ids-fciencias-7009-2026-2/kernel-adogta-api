@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface SolicitudRepository : JpaRepository<SolicitudEntity, SolicitudId> {
-    fun existsByIdIdUsuarioAndIdAnimalAndIdPublicacionAnimalAndIdUsuarioAnimal(
+    fun existsByIdUsuarioAndIdAnimalAndIdPublicacionAnimalAndIdUsuarioAnimal(
         idUsuario: Int,
         idAnimal: Int,
         idPublicacionAnimal: Int,
