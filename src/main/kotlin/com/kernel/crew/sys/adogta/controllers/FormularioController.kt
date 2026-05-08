@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
+import java.time.Period
 
 /**
  * Controlador REST que expone los endpoints relacionados con la entidad Formulario.
@@ -45,4 +47,25 @@ import org.springframework.web.bind.annotation.RestController
 
         return ResponseEntity.status(201).body(formularioGuardado)
     }
+
+    @GetMapping("/puede-responder")
+    fun validarTiempo(@RequestHeader("Authorization") token: String): ResponseEntity<Any> {
+        logger.info("GET /formularios/puede-responder")
+
+        val ultimaFecha = formularioService.obtenerFechaEnvioFormulario(token)
+            ?: return ResponseEntity.ok(mapOf("mensaje" to "Puede contestar de nuevo."))
+
+
+        val fechaActual = LocalDate.now()
+
+           val tiempoTranscurrido = Period.between(ultimaFecha, fechaActual)
+
+           val tiempoFaltante = 365 - tiempoTranscurrido.days
+
+        if(tiempoTranscurrido.months <= 11){
+            return ResponseEntity.status(409).body(mapOf("error" to "Debe pasar un año para que puedas contestar el cuestionario de nuevo. Faltan $tiempoFaltante días."))
+        }
+        return ResponseEntity.ok(mapOf("mensaje" to "Puede contestar de nuevo."))
+    }
+
 }
