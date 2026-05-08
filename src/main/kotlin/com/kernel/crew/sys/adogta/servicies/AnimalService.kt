@@ -5,7 +5,6 @@ import com.kernel.crew.sys.adogta.dto.response.AnimalListItemResponse
 import com.kernel.crew.sys.adogta.dto.response.AnimalResponse
 import com.kernel.crew.sys.adogta.entities.AnimalEntity
 import com.kernel.crew.sys.adogta.entities.PublicacionEntity
-import com.kernel.crew.sys.adogta.entities.PublicacionId
 import com.kernel.crew.sys.adogta.repositories.AnimalRepository
 import com.kernel.crew.sys.adogta.repositories.PublicacionRepository
 import com.kernel.crew.sys.adogta.repositories.RazaRepository
@@ -24,64 +23,78 @@ class AnimalService(
 ) {
     private val logger = LoggerFactory.getLogger(AnimalService::class.java)
 
+    /**
+     * Publica un nuevo animal en adopción asociado al usuario autenticado.
+     *
+     * @param token Token de sesión del usuario autenticado.
+     * @param request Datos del animal a publicar.
+     * @return [AnimalResponse] del animal recién publicado, o null si la sesión es inválida.
+     */
     @Transactional
     fun publicarAnimal(token: String, request: AnimalRequest): AnimalResponse? {
         logger.info("Publicando animal: ${request.nombre} (${request.tipo}, raza ${request.idRaza})")
 
         val usuarioAutenticado = usuarioService.getMe(token)
-        if (usuarioAutenticado == null) {
-            logger.warn("Sesión inválida al publicar animal")
-            return null
-        }
+            ?: run {
+                logger.warn("Sesión inválida al publicar animal")
+                return null
+            }
 
         val usuario = usuarioRepository.findById(usuarioAutenticado.id)
             .orElseThrow { RuntimeException("Usuario no encontrado con id: ${usuarioAutenticado.id}") }
 
-        val raza = razaRepository.findById(request.idRaza).orElse(null)
-        if (raza == null) {
-            logger.warn("Raza no encontrada con id: ${request.idRaza}")
-            throw RuntimeException("Raza no encontrada con id: ${request.idRaza}")
-        }
+        val raza = razaRepository.findById(request.idRaza)
+            .orElseThrow { RuntimeException("Raza no encontrada con id: ${request.idRaza}") }
 
-        val nuevaPublicacion = PublicacionEntity(
-            id = PublicacionId(idUsuario = usuario.id!!.toInt()),
-            usuario = usuario,
-            estado = "Activa"
-        )
-        val publicacionGuardada = publicacionRepository.save(nuevaPublicacion)
+        if (request.esterilizado != true)
+            throw IllegalArgumentException("Solo se aceptan animales esterilizados.")
 
-        val nuevoAnimal = AnimalEntity(
-            idPublicacion = publicacionGuardada.id!!.idPublicacion,
-            idUsuario = usuario.id!!.toInt(),
-            publicacion = publicacionGuardada,
-            usuario = usuario,
-            nombre = request.nombre.trim(),
-            estadoVacunacion = request.estadoVacunacion,
-            esterilizado = request.esterilizado!!,
-            descripcion = request.descripcion.trim(),
-            entrenado = request.entrenado,
-            codigoPostal = request.codigoPostal,
-            edad = request.edad,
-            tipo = request.tipo,
-            raza = raza,
-            overrideEnergia = request.overrideEnergia,
-            overrideIndependencia = request.overrideIndependencia,
-            overrideSociableNiños = request.overrideSociableNiños,
-            overrideSociableMascotas = request.overrideSociableMascotas,
-            padecimientos = request.padecimientos.map { it.trim() }.filter { it.isNotEmpty() }.toMutableSet(),
-            fotos = request.fotos.map { it.trim() }.filter { it.isNotEmpty() }.toMutableSet()
+        val publicacionGuardada = publicacionRepository.save(
+            PublicacionEntity(
+                idUsuario = usuario.id!!.toInt(),
+                usuario = usuario,
+                estado = "Activa"
+            )
         )
 
-        val animalGuardado = animalRepository.save(nuevoAnimal)
-        logger.info("Animal publicado: id=${animalGuardado.idAnimal}, publicacion=${publicacionGuardada.id?.idPublicacion}")
+        val animalGuardado = animalRepository.save(
+            AnimalEntity(
+                idPublicacion = publicacionGuardada.idPublicacion,
+                idUsuario = usuario.id!!.toInt(),
+                publicacion = publicacionGuardada,
+                usuario = usuario,
+                nombre = request.nombre.trim(),
+                estadoVacunacion = request.estadoVacunacion,
+                esterilizado = request.esterilizado,
+                descripcion = request.descripcion.trim(),
+                entrenado = request.entrenado,
+                codigoPostal = request.codigoPostal,
+                edad = request.edad,
+                tipo = request.tipo,
+                raza = raza,
+                overrideEnergia = request.overrideEnergia,
+                overrideIndependencia = request.overrideIndependencia,
+                overrideSociableNiños = request.overrideSociableNiños,
+                overrideSociableMascotas = request.overrideSociableMascotas,
+                padecimientos = request.padecimientos.map { it.trim() }.filter { it.isNotEmpty() }.toMutableSet(),
+                fotos = request.fotos.map { it.trim() }.filter { it.isNotEmpty() }.toMutableSet()
+            )
+        )
+
+        logger.info("Animal publicado: id=${animalGuardado.idAnimal}, publicacion=${publicacionGuardada.idPublicacion}")
 
         return AnimalResponse(
             idAnimal = animalGuardado.idAnimal,
-            idPublicacion = publicacionGuardada.id?.idPublicacion,
+            idPublicacion = publicacionGuardada.idPublicacion,
             nombre = animalGuardado.nombre
         )
     }
 
+    /**
+     * Retorna la lista de publicaciones activas con sus animales.
+     *
+     * @return Lista de [AnimalListItemResponse] con los animales en adopción.
+     */
     @Transactional(readOnly = true)
     fun listarPublicaciones(): List<AnimalListItemResponse> {
         logger.info("Listando publicaciones de animales activas")
