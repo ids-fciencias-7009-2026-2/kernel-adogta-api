@@ -1,14 +1,15 @@
 package com.kernel.crew.sys.adogta.dto.request
 
-import jakarta.validation.constraints.*
+import jakarta.validation.constraints.AssertTrue
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.PositiveOrZero
+import jakarta.validation.constraints.Size
 
-/**
- * DTO que representa el cuerpo de la petición para publicar un animal en adopción.
- *
- * Endpoint: POST /api/animales/publicar
- */
 data class AnimalRequest(
-
     @field:NotBlank(message = "El nombre del animal es obligatorio.")
     @field:Size(max = 100, message = "El nombre no puede exceder 100 caracteres.")
     val nombre: String,
@@ -31,12 +32,15 @@ data class AnimalRequest(
     val codigoPostal: String,
 
     @field:NotBlank(message = "El estado de vacunación es obligatorio.")
-    @field:Pattern(regexp = "^(Completo|Parcial)$", message = "El estado de vacunación debe ser 'Completo' o 'Parcial'.")
+    @field:Pattern(
+        regexp = "^(Completo|Parcial)$",
+        message = "El estado de vacunación debe ser 'Completo' o 'Parcial'."
+    )
     val estadoVacunacion: String,
 
     @field:NotNull(message = "Indica el estado de esterilización del animal.")
+    @field:AssertTrue(message = "Solo se aceptan animales esterilizados.")
     val esterilizado: Boolean?,
-
     val entrenado: Boolean,
 
     @field:Min(value = 1, message = "El id de la raza debe ser positivo.")
