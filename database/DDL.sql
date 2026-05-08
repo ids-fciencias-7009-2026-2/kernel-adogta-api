@@ -109,6 +109,8 @@ COMMENT ON CONSTRAINT chk_admin_pass  ON Administrador IS 'La contraseña debe t
 -- -------------------------------------------------------------
 CREATE TABLE Raza (
     id_raza  SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    tipo VARCHAR(5) NOT NULL,
     talla INT NOT NULL,
     independencia INT NOT NULL,
     nivel_energia INT NOT NULL,
@@ -122,12 +124,15 @@ CREATE TABLE Raza (
     CONSTRAINT chk_nivel_energia CHECK (nivel_energia >= 1 AND nivel_energia <= 5),
     CONSTRAINT chk_sociable_niños CHECK (sociable_niños >= 1 AND sociable_niños <= 5),
     CONSTRAINT chk_sociable_mascotas CHECK (sociable_mascotas >= 1 AND sociable_mascotas <= 5),
-    CONSTRAINT chk_hipoalergenico CHECK (es_hipoalergenico IN (0, 1))
+    CONSTRAINT chk_hipoalergenico CHECK (es_hipoalergenico IN (0, 1)),
+    CONSTRAINT chk_tipo_raza         CHECK (tipo IN ('Perro', 'Gato'))
 );
 
 COMMENT ON TABLE Raza IS 'Catálogo de razas de perros y gatos. Su información tiene que provenir de The Dog API y The Cat API.';
 
 COMMENT ON COLUMN Raza.id_raza         IS 'Identificador único de la raza. Generado automáticamente por la base de datos.';
+COMMENT ON COLUMN Raza.nombre            IS 'Nombre de la raza, por ejemplo: Chihuahua, Siamés.';
+COMMENT ON COLUMN Raza.tipo              IS 'Tipo de animal al que pertenece la raza: Perro o Gato.';
 COMMENT ON COLUMN Raza.talla IS 'Talla de la raza.';
 COMMENT ON COLUMN Raza.independencia IS 'Nivel de independencia de la raza.';
 COMMENT ON COLUMN Raza.nivel_energia IS 'Nivel de energía de la raza.';
@@ -142,6 +147,7 @@ COMMENT ON CONSTRAINT chk_nivel_energia ON Raza IS 'El nivel de energía debe se
 COMMENT ON CONSTRAINT chk_sociable_niños ON Raza IS 'El nivel de sociabilidad con niños debe ser un valor entre 1 y 5, donde 1 es nada sociable y 5 es muy sociable.';
 COMMENT ON CONSTRAINT chk_sociable_mascotas ON Raza IS 'El nivel de sociabilidad con otras mascotas debe ser un valor entre 1 y 5, donde 1 es nada sociable y 5 es muy sociable.';
 COMMENT ON CONSTRAINT chk_hipoalergenico ON Raza IS 'El campo es_hipoalergenico solo acepta los valores 0 (no hipoalergénico) o 1 (hipoalergénico).';   
+COMMENT ON CONSTRAINT chk_tipo_raza         ON Raza IS 'Solo se permiten los tipos Perro o Gato.';
 
 -- -------------------------------------------------------------
 -- Tabla: Publicacion

@@ -13,6 +13,8 @@ class RazaEntity(
 
     val nombre: String,
 
+    val tipo: String,
+
     val talla: Int,
 
     val independencia: Int,
