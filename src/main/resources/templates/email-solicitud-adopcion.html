@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nueva solicitud de adopción</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td align="center">
+                <table width="500" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <tr>
+                        <td style="background-color: #F4A26C; padding: 20px; text-align: center;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Adogta</h1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 30px;">
+                            <h2 style="color: #333333; font-size: 20px;">¡Tienes una nueva solicitud de adopción!</h2>
+                            <p style="color: #555555; font-size: 16px; line-height: 1.5;">
+                                Hola,<br><br>
+                                Un usuario de <strong>Adogta</strong> ha expresado interés en adoptar a
+                                <strong th:text="${nombreAnimal}">la mascota</strong>.
+                            </p>
+                            <table cellpadding="8" cellspacing="0" style="margin: 20px 0; width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="color: #555555; font-size: 14px; border-bottom: 1px solid #eeeeee;"><strong>Adoptante:</strong></td>
+                                    <td style="color: #555555; font-size: 14px; border-bottom: 1px solid #eeeeee;" th:text="${nombreAdoptante}">Nombre del adoptante</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #555555; font-size: 14px; border-bottom: 1px solid #eeeeee;"><strong>Correo:</strong></td>
+                                    <td style="color: #555555; font-size: 14px; border-bottom: 1px solid #eeeeee;" th:text="${emailAdoptante}">correo@ejemplo.com</td>
+                                </tr>
+                                <tr th:if="${telefonoAdoptante}">
+                                    <td style="color: #555555; font-size: 14px; border-bottom: 1px solid #eeeeee;"><strong>Teléfono:</strong></td>
+                                    <td style="color: #555555; font-size: 14px; border-bottom: 1px solid #eeeeee;" th:text="${telefonoAdoptante}">000-000-0000</td>
+                                </tr>
+                            </table>
+                            <p style="color: #555555; font-size: 16px; line-height: 1.5;">
+                                Inicia sesión en <strong>Adogta</strong> para revisar el perfil del adoptante
+                                y continuar el proceso de adopción.
+                            </p>
+                            <p style="color: #888888; font-size: 12px;">
+                                Si no publicaste esta mascota en Adogta, puedes ignorar este mensaje.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 12px; color: #aaaaaa;">
+                            &copy; 2026 Adogta. Todos los derechos reservados.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

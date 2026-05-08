@@ -82,4 +82,5 @@ data class RegisterRequest(
      * Indica si el usuario se registra como donante
      * */
     val esDonante: Boolean
+
 )

@@ -70,7 +70,8 @@ fun UsuarioEntity.toDomain(): Usuario {
         tokenRecuperacionContrasena = this.tokenRecuperacionContrasena,
         fechaExpiracionTokenRecuperacion = this.fechaExpiracionTokenRecuperacion?.toString(),
         esAdoptante = this.esAdoptante,
-        esDonante = this.esDonante
+        esDonante = this.esDonante,
+        envioFormulario = this.envioFormulario
     )
 }
 

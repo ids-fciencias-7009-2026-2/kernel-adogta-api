@@ -6,8 +6,8 @@ import com.kernel.crew.sys.adogta.dto.request.AnimalUpdateRequest
 import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
@@ -37,6 +37,22 @@ class AnimalController {
     lateinit var animalService: AnimalService
 
     /**
+     * Retorna la lista de publicaciones activas con sus animales.
+     *
+     * @return 200 con la lista de animales en adopción.
+     */
+    @GetMapping
+    fun listarAnimales(): ResponseEntity<Any> {
+        logger.info("GET /api/animales")
+        return try {
+            ResponseEntity.ok(animalService.listarPublicaciones())
+        } catch (e: Exception) {
+            logger.warn("Error al listar publicaciones de animales: ${e.message}")
+            ResponseEntity.status(500).body(mapOf("error" to e.message))
+        }
+    }
+
+    /**
      * Publica un nuevo animal en adopción asociado al usuario autenticado.
      *
      * Endpoint protegido: requiere un token válido en el header 'Authorization'.
@@ -54,13 +70,18 @@ class AnimalController {
     ): ResponseEntity<Any> {
         logger.info("POST /api/animales/publicar - ${request.nombre} (${request.tipo})")
 
-        if (token == null) return ResponseEntity.status(401).build()
+        if (token == null) {
+            logger.warn("POST /api/animales/publicar sin token de sesión")
+            return ResponseEntity.status(401).build()
+        }
 
         return try {
             val nuevoAnimal = animalService.publicarAnimal(token, request)
-                ?: return ResponseEntity.status(401).build()
-
-            ResponseEntity.status(HttpStatus.CREATED).body(nuevoAnimal)
+            if (nuevoAnimal == null) {
+                logger.warn("POST /api/animales/publicar con token inválido o expirado")
+                return ResponseEntity.status(401).build()
+            }
+            ResponseEntity.status(201).body(nuevoAnimal)
         } catch (e: Exception) {
             logger.warn("Error al publicar animal: ${e.message}")
             ResponseEntity.status(400).body(mapOf("error" to e.message))

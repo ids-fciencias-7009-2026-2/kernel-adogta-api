@@ -1,6 +1,7 @@
 package com.kernel.crew.sys.adogta.servicies
 
 import com.kernel.crew.sys.adogta.dto.request.AnimalRequest
+import com.kernel.crew.sys.adogta.dto.response.AnimalListItemResponse
 import com.kernel.crew.sys.adogta.dto.response.AnimalResponse
 import com.kernel.crew.sys.adogta.entities.AnimalEntity
 import com.kernel.crew.sys.adogta.entities.PublicacionEntity
@@ -24,6 +25,13 @@ class AnimalService(
 ) {
     private val logger = LoggerFactory.getLogger(AnimalService::class.java)
 
+    /**
+     * Publica un nuevo animal en adopción asociado al usuario autenticado.
+     *
+     * @param token Token de sesión del usuario autenticado.
+     * @param request Datos del animal a publicar.
+     * @return [AnimalResponse] del animal recién publicado, o null si la sesión es inválida.
+     */
     @Transactional
     fun publicarAnimal(token: String, request: AnimalRequest): AnimalResponse? {
         logger.info("Publicando animal: ${request.nombre} (${request.tipo}, raza ${request.idRaza})")
