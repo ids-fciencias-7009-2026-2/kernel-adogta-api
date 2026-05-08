@@ -3,7 +3,6 @@ package com.kernel.crew.sys.adogta.controllers
 import com.kernel.crew.sys.adogta.servicies.UsuarioService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestHeader
@@ -55,10 +54,15 @@ class UploadController {
     ): ResponseEntity<Any> {
         logger.info("POST /api/upload - ${file.originalFilename ?: "(sin nombre)"}")
 
-        if (token == null) return ResponseEntity.status(401).build()
+        if (token == null) {
+            logger.warn("POST /api/upload sin token de sesión")
+            return ResponseEntity.status(401).build()
+        }
 
-        usuarioService.getMe(token)
-            ?: return ResponseEntity.status(401).build()
+        if (usuarioService.getMe(token) == null) {
+            logger.warn("POST /api/upload con token inválido o expirado")
+            return ResponseEntity.status(401).build()
+        }
 
         if (file.isEmpty) return ResponseEntity.status(400).body(mapOf("error" to "Archivo vacío"))
 
@@ -67,6 +71,6 @@ class UploadController {
         file.inputStream.use { Files.copy(it, uploadDir.resolve(storedName)) }
 
         logger.info("Archivo guardado: $storedName")
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapOf("url" to "http://localhost:8080/uploads/$storedName"))
+        return ResponseEntity.status(201).body(mapOf("url" to "http://localhost:8080/uploads/$storedName"))
     }
 }

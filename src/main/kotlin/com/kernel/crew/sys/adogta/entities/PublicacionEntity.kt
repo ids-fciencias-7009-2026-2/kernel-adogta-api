@@ -2,6 +2,13 @@ package com.kernel.crew.sys.adogta.entities
 
 import jakarta.persistence.*
 
+/**
+ * Entidad JPA que representa la tabla Publicacion del DDL.
+ *
+ * La PK es compuesta (id_publicacion, id_usuario).
+ * id_publicacion es generado por la secuencia publicacion_id_publicacion_seq de PostgreSQL.
+ * id_usuario corresponde al usuario donante que creó la publicación.
+ */
 @Entity
 @Table(name = "publicacion")
 @IdClass(PublicacionId::class)

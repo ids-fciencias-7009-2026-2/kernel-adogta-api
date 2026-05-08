@@ -18,4 +18,24 @@ interface EmailService {
      * @param token        Token único (UUID) que identifica la solicitud y se incluye en el enlace.
      */
     fun enviarCorreoRecuperacion(destinatario: String, token: String)
+
+    /**
+     * Notifica al donante que un adoptante expresó interés en la publicación de su mascota.
+     *
+     * Manda un mensaje en HTML con los datos del animal publicado y los datos de contacto
+     * del adoptante para que el donante pueda continuar el proceso de adopción.
+     *
+     * @param destinatario     Correo electrónico del usuario donante (publicador).
+     * @param nombreAnimal     Nombre del animal sobre el que se expresó interés.
+     * @param nombreAdoptante  Nombre completo del usuario adoptante.
+     * @param emailAdoptante   Correo electrónico del adoptante.
+     * @param telefonoAdoptante Teléfono del adoptante (puede ser nulo si no lo registró).
+     */
+    fun enviarCorreoSolicitudAdopcion(
+        destinatario: String,
+        nombreAnimal: String,
+        nombreAdoptante: String,
+        emailAdoptante: String,
+        telefonoAdoptante: String?
+    )
 }
