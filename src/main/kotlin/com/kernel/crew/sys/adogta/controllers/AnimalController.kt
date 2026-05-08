@@ -7,24 +7,13 @@ import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.*
 
 /**
  * Controlador REST que expone los endpoints relacionados con la entidad Animal.
  *
  * Maneja las operaciones de publicación y consulta de animales en adopción
  * bajo la ruta base '/api/animales'.
- *
- * Toda la lógica de negocio está delegada a [AnimalService].
- * Este controlador solo recibe peticiones, llama al service y devuelve respuestas.
  */
 @RestController
 @RequestMapping("/api/animales")
@@ -36,9 +25,9 @@ class AnimalController {
     lateinit var animalService: AnimalService
 
     /**
-     * Retorna la lista de publicaciones activas con sus animales.
+     * Lista todos los animales en adopción. Endpoint público.
      *
-     * @return 200 con la lista de animales en adopción.
+     * @return 200 con lista de animales, 500 si hay error.
      */
     @GetMapping
     fun listarAnimales(): ResponseEntity<Any> {
@@ -52,15 +41,11 @@ class AnimalController {
     }
 
     /**
-     * Publica un nuevo animal en adopción asociado al usuario autenticado.
+     * Publica un nuevo animal en adopción.
      *
-     * Endpoint protegido: requiere un token válido en el header 'Authorization'.
-     *
-     * @param token Token de sesión enviado en el header 'Authorization'.
+     * @param token Token de sesión del usuario.
      * @param request Datos del animal a publicar.
-     * @return 201 con los datos del animal publicado,
-     *         400 si los datos son inválidos,
-     *         o 401 si el token es nulo, inválido o la sesión expiró.
+     * @return 201 con datos del animal, 401 si falta el token o es inválido, 400 si hay error.
      */
     @PostMapping("/publicar")
     fun publicarAnimal(
@@ -68,12 +53,10 @@ class AnimalController {
         @Valid @RequestBody request: AnimalRequest
     ): ResponseEntity<Any> {
         logger.info("POST /api/animales/publicar - ${request.nombre} (${request.tipo})")
-
         if (token == null) {
             logger.warn("POST /api/animales/publicar sin token de sesión")
             return ResponseEntity.status(401).build()
         }
-
         return try {
             val nuevoAnimal = animalService.publicarAnimal(token, request)
             if (nuevoAnimal == null) {
@@ -97,10 +80,15 @@ class AnimalController {
     fun misPublicaciones(
         @RequestHeader("Authorization", required = false) token: String?
     ): ResponseEntity<Any> {
-        if (token == null) return ResponseEntity.status(401).build()
+        logger.info("GET /api/animales/mis-publicaciones")
+        if (token == null) {
+            logger.warn("GET /api/animales/mis-publicaciones sin token")
+            return ResponseEntity.status(401).build()
+        }
         return try {
             ResponseEntity.ok(animalService.listarMisPublicaciones(token))
         } catch (e: Exception) {
+            logger.warn("Error al listar publicaciones propias: ${e.message}")
             ResponseEntity.status(400).body(mapOf("error" to e.message))
         }
     }
@@ -118,10 +106,15 @@ class AnimalController {
         @RequestHeader("Authorization", required = false) token: String?,
         @PathVariable idAnimal: Int
     ): ResponseEntity<Any> {
-        if (token == null) return ResponseEntity.status(401).build()
+        logger.info("GET /api/animales/{}/editar", idAnimal)
+        if (token == null) {
+            logger.warn("GET /api/animales/{}/editar sin token", idAnimal)
+            return ResponseEntity.status(401).build()
+        }
         return try {
             ResponseEntity.ok(animalService.obtenerAnimalParaEditar(token, idAnimal))
         } catch (e: Exception) {
+            logger.warn("Error al obtener animal para editar (id={}): {}", idAnimal, e.message)
             ResponseEntity.status(400).body(mapOf("error" to e.message))
         }
     }
@@ -141,11 +134,16 @@ class AnimalController {
         @PathVariable idAnimal: Int,
         @Valid @RequestBody request: AnimalUpdateRequest
     ): ResponseEntity<Any> {
-        if (token == null) return ResponseEntity.status(401).build()
+        logger.info("PUT /api/animales/{}", idAnimal)
+        if (token == null) {
+            logger.warn("PUT /api/animales/{} sin token", idAnimal)
+            return ResponseEntity.status(401).build()
+        }
         return try {
             val animal = animalService.editarAnimal(token, idAnimal, request)
             ResponseEntity.ok(mapOf("mensaje" to "Animal actualizado", "idAnimal" to animal.idAnimal))
         } catch (e: Exception) {
+            logger.warn("Error al editar animal (id={}): {}", idAnimal, e.message)
             ResponseEntity.status(400).body(mapOf("error" to e.message))
         }
     }
@@ -163,11 +161,16 @@ class AnimalController {
         @RequestHeader("Authorization", required = false) token: String?,
         @PathVariable idPublicacion: Int
     ): ResponseEntity<Any> {
-        if (token == null) return ResponseEntity.status(401).build()
+        logger.info("DELETE /api/animales/{}", idPublicacion)
+        if (token == null) {
+            logger.warn("DELETE /api/animales/{} sin token", idPublicacion)
+            return ResponseEntity.status(401).build()
+        }
         return try {
             animalService.cambiarEstadoPublicacion(token, idPublicacion, "Borrada")
             ResponseEntity.ok(mapOf("mensaje" to "Publicación eliminada"))
         } catch (e: Exception) {
+            logger.warn("Error al eliminar publicación (id={}): {}", idPublicacion, e.message)
             ResponseEntity.status(400).body(mapOf("error" to e.message))
         }
     }
