@@ -110,6 +110,19 @@ class AnimalService(
     }
 
     /**
+     * Retorna la lista de publicaciones activas con sus animales.
+     *
+     * @return Lista de [AnimalListItemResponse] con los animales en adopción.
+     */
+    @Transactional(readOnly = true)
+    fun listarPublicaciones(): List<AnimalListItemResponse> {
+        logger.info("Listando publicaciones de animales activas")
+        return animalRepository.findAll()
+            .filter { it.publicacion.estado == "Activa" }
+            .map(AnimalListItemResponse::from)
+    }
+
+    /**
      * Obtiene los datos editables de un animal.
      * Solo el dueño de la publicación puede acceder.
      * @param token Token de sesión del usuario.
