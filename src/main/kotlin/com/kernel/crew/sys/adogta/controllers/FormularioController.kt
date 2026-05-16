@@ -68,4 +68,17 @@ import java.time.Period
         return ResponseEntity.ok(mapOf("mensaje" to "Puede contestar de nuevo."))
     }
 
+    @GetMapping("/pendiente-contestar")
+    fun encontrarEnvioFormulario(@RequestHeader("Authorization") token: String): ResponseEntity<Any> {
+        logger.info("GET formularios/pendiente-contestar")
+
+        val envioFormulario = formularioService.obtenerEnvioFormulario(token)
+
+        if (envioFormulario != true) {
+            return ResponseEntity.status(202).body(mapOf("mensaje" to "Pendiente"))
+        }
+
+        return ResponseEntity.status(200).body(mapOf("mensaje" to "Enviado"))
+    }
+
 }
