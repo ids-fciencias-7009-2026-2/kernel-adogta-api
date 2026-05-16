@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import com.kernel.crew.sys.adogta.enums.*
+import com.kernel.crew.sys.adogta.dto.response.FormularioStringsResponse
 
 /**
  * Servicio que contiene la lógica de negocio relacionada con la entidad Formulario.
@@ -73,6 +74,31 @@ class FormularioService{
             tiempoEjercicio = ultimo.tiempoEjercicio,
             tiempoSoledad = ultimo.tiempoSoledad,
             tieneNiños = ultimo.tieneNiños
+        )
+    }
+
+    /**
+     * Obtiene el último formulario contestado por el usuario autenticado,
+     * devolviendo las etiquetas de cada respuesta en lugar de los valores numéricos.
+     *
+     * @param token Token de sesión del usuario.
+     * @return [FormularioStringsResponse] o null si no ha contestado ninguno.
+     */
+    fun obtenerUltimoFormularioStrings(token: String): FormularioStringsResponse? {
+        val usuario = usuarioService.getAsEntity(token)
+            ?: throw NoSuchElementException("Usuario no encontrado")
+        val formularios = formularioRepository.findAllByUsuarioId(usuario.id)
+        val ultimo = formularios.maxByOrNull { it.fechaEnvio } ?: return null
+
+        return FormularioStringsResponse(
+            id = ultimo.id,
+            presupuesto = Presupuesto.entries.firstOrNull { it.valor == ultimo.presupuesto }?.name ?: "—",
+            tieneAlergias = TieneAlergias.entries.firstOrNull { it.valor == ultimo.tieneAlergias }?.name ?: "—",
+            fechaEnvio = ultimo.fechaEnvio.toString(),
+            tieneMascotas = TieneMascotas.entries.firstOrNull { it.valor == ultimo.tieneMascotas }?.name ?: "—",
+            tiempoEjercicio = TiempoEjercicio.entries.firstOrNull { it.valor == ultimo.tiempoEjercicio }?.name ?: "—",
+            tiempoSoledad = TiempoSoledad.entries.firstOrNull { it.valor == ultimo.tiempoSoledad }?.name ?: "—",
+            tieneNiños = TieneNiños.entries.firstOrNull { it.valor == ultimo.tieneNiños }?.name ?: "—"
         )
     }
 

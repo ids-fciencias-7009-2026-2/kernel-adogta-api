@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import com.kernel.crew.sys.adogta.dto.response.FormularioStringsResponse
 import java.time.LocalDate
 import java.time.Period
 
@@ -69,19 +70,24 @@ import java.time.Period
     }
 
     /**
-     * Obtiene el formulario contestado por el usuario.
-     * @return [FormularioResponse], 404 si no ha contestado.
+     * Obtiene el formulario contestado por el usuario,
+     * con labels de las respuestas.
+     *
+     * @param token Token de sesión del usuario.
+     * @return [FormularioStringsResponse], 404 si no ha contestado ninguno.
      */
     @GetMapping("/ultimo")
-    fun obtenerUltimoFormulario(
+    fun obtenerUltimoFormularioStrings(
         @RequestHeader("Authorization") token: String
     ): ResponseEntity<Any> {
         logger.info("GET /formularios/ultimo")
-        val formulario = formularioService.obtenerUltimoFormularioResponse(token)
+        val formulario = formularioService.obtenerUltimoFormularioStrings(token)
             ?: return ResponseEntity.status(404).body(
                 mapOf("error" to "No se encontró un formulario para este usuario.")
             )
         return ResponseEntity.ok(formulario)
     }
+
+    
 
 }
