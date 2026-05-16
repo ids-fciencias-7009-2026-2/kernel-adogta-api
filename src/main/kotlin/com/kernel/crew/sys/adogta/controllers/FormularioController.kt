@@ -56,16 +56,16 @@ import java.time.Period
         val ultimaFecha = formularioService.obtenerFechaEnvioFormulario(token)
             ?: return ResponseEntity.ok(mapOf("mensaje" to "Puede contestar de nuevo."))
 
-
         val fechaActual = LocalDate.now()
+        val diasTranscurridos = java.time.temporal.ChronoUnit.DAYS.between(ultimaFecha, fechaActual)
 
-           val tiempoTranscurrido = Period.between(ultimaFecha, fechaActual)
-
-           val tiempoFaltante = 365 - tiempoTranscurrido.days
-
-        if(tiempoTranscurrido.months <= 11){
-            return ResponseEntity.status(409).body(mapOf("error" to "Debe pasar un año para que puedas contestar el cuestionario de nuevo. Faltan $tiempoFaltante días."))
+        if (diasTranscurridos < 365) {
+            val diasFaltantes = 365 - diasTranscurridos
+            return ResponseEntity.status(409).body(
+                mapOf("error" to "Debe pasar un año para que puedas contestar el cuestionario de nuevo. Faltan $diasFaltantes días.")
+            )
         }
+
         return ResponseEntity.ok(mapOf("mensaje" to "Puede contestar de nuevo."))
     }
 
