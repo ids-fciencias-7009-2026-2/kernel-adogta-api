@@ -6,6 +6,7 @@ import com.kernel.crew.sys.adogta.entities.UsuarioEntity
 import com.kernel.crew.sys.adogta.repositories.FormularioRepository
 import com.kernel.crew.sys.adogta.repositories.UsuarioRepository
 import com.kernel.crew.sys.adogta.servicies.UsuarioService
+import com.kernel.crew.sys.adogta.dto.response.FormularioResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -52,6 +53,27 @@ class FormularioService{
     fun obtenerFechaEnvioFormulario(token: String): LocalDate? {
         val usuarioEncontrado = usuarioService.getAsEntity(token) ?: throw NoSuchElementException("No se encontró un usuario con ese token")
         return formularioRepository.getFechaEnvioFormulario(usuarioEncontrado.id)
+    }
+
+    /**
+     * Obtiene el formulario contestado por el usuario.
+     * @return [FormularioResponse] eoc null.
+     */
+    fun obtenerUltimoFormularioResponse(token: String): FormularioResponse? {
+        val usuario = usuarioService.getAsEntity(token)
+            ?: throw NoSuchElementException("Usuario no encontrado")
+        val formularios = formularioRepository.findAllByUsuarioId(usuario.id)
+        val ultimo = formularios.maxByOrNull { it.fechaEnvio } ?: return null
+        return FormularioResponse(
+            id = ultimo.id,
+            presupuesto = ultimo.presupuesto,
+            tieneAlergias = ultimo.tieneAlergias,
+            fechaEnvio = ultimo.fechaEnvio.toString(),
+            tieneMascotas = ultimo.tieneMascotas,
+            tiempoEjercicio = ultimo.tiempoEjercicio,
+            tiempoSoledad = ultimo.tiempoSoledad,
+            tieneNiños = ultimo.tieneNiños
+        )
     }
 
 }

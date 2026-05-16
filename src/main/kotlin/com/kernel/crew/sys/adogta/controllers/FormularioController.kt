@@ -68,4 +68,20 @@ import java.time.Period
         return ResponseEntity.ok(mapOf("mensaje" to "Puede contestar de nuevo."))
     }
 
+    /**
+     * Obtiene el formulario contestado por el usuario.
+     * @return [FormularioResponse], 404 si no ha contestado.
+     */
+    @GetMapping("/ultimo")
+    fun obtenerUltimoFormulario(
+        @RequestHeader("Authorization") token: String
+    ): ResponseEntity<Any> {
+        logger.info("GET /formularios/ultimo")
+        val formulario = formularioService.obtenerUltimoFormularioResponse(token)
+            ?: return ResponseEntity.status(404).body(
+                mapOf("error" to "No se encontró un formulario para este usuario.")
+            )
+        return ResponseEntity.ok(formulario)
+    }
+
 }
