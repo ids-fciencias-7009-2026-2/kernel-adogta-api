@@ -8,6 +8,7 @@ import com.kernel.crew.sys.adogta.repositories.AnimalRepository
 import com.kernel.crew.sys.adogta.repositories.SolicitudRepository
 import com.kernel.crew.sys.adogta.repositories.UsuarioRepository
 import org.slf4j.LoggerFactory
+import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -109,5 +110,18 @@ class SolicitudService(
             estado = guardada.estado,
             fecha = guardada.fecha
         )
+    }
+
+    /**
+     * Metodo que verifica el interes de una publiacion de algun animal, la implementacion es
+     * booleana por lo que no requiere verifiaciones de existencia.
+     *
+     * @param token Token de sesion del usuario actual.
+     * @param idPublicacion Identificador de la publiacion de la que sea desea verificar el interes.
+     * @return [VerdaderoFalso] si la publiacion con el id esta marcada con interes.
+     * */
+    open fun verificaInteres (token: String, idPublicacion:Int): Boolean {
+        val usuarioActual = usuarioRepository.findByTokenSesion(token) ?: return false
+        return solicitudRepository.existsByUsuarioAndIdPublicacionAnimal(usuarioActual, idPublicacion)
     }
 }

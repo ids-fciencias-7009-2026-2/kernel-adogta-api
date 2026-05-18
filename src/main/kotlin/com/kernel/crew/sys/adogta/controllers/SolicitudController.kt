@@ -1,16 +1,20 @@
 package com.kernel.crew.sys.adogta.controllers
 
 import com.kernel.crew.sys.adogta.dto.request.SolicitudRequest
+import com.kernel.crew.sys.adogta.dto.response.SolicitudResponse
 import com.kernel.crew.sys.adogta.servicies.SolicitudService
 import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 
 /**
  * Controlador REST que expone los endpoints relacionados con la entidad Solicitud.
@@ -70,6 +74,27 @@ class SolicitudController {
         } catch (e: Exception) {
             logger.warn("Error al crear solicitud: ${e.message}")
             ResponseEntity.status(500).body(mapOf("error" to e.message))
+        }
+    }
+
+    /**
+     * Endpoint para verificar si el usuario actual a expresado su interes respecto a una publiaicon
+     * especifica.
+     *
+     * @param token Token de sesion del usuario actual.
+     * @param idPublicacion el identificador de una publicacion de algun animal.
+     * @return Success en formato 200 para indicar que es verdadera la expresion de interes.
+     * */
+    @GetMapping("/verificar/{idPublicacion}")
+    open fun verificarInteres(@RequestHeader("Authorization", required = false) token: String?, @PathVariable idPublicacion: Int): ResponseEntity<Any> {
+        if (token == null)
+            return ResponseEntity.status(401).build()
+        try {
+            val estaExpresado = solicitudService.verificaInteres(token, idPublicacion)
+            return ResponseEntity.ok().body(mapOf("interes_expresado" to estaExpresado))
+        } catch (e: IllegalArgumentException) {
+            logger.warn("Solicitud invalida: ${e.message}")
+            return ResponseEntity.status(400).body(mapOf("error" to e.message))
         }
     }
 }
