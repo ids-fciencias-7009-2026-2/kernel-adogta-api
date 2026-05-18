@@ -9,7 +9,9 @@ class AdogtaApplication
 
 fun main(args: Array<String>) {
 
-	val dotenv = dotenv()
+	val dotenv = dotenv {
+		directory = "./kernel-adogta-api" // Le fuerza a buscar dentro de la carpeta de la API
+	}
 
 	System.setProperty("URL_DB", dotenv["URL_DB"])
 	System.setProperty("USER_DB", dotenv["USER_DB"])
@@ -20,6 +22,9 @@ fun main(args: Array<String>) {
 	System.setProperty("MAIL_USERNAME", dotenv["MAIL_USERNAME"])
 	System.setProperty("MAIL_PASSWORD", dotenv["MAIL_PASSWORD"])
 	System.setProperty("APP_BASE_URL", dotenv["APP_BASE_URL"])
+
+	System.setProperty("DOG_API_KEY", dotenv["DOG_API_KEY"])
+	System.setProperty("CAT_API_KEY", dotenv["CAT_API_KEY"])
 
 	runApplication<AdogtaApplication>(*args)
 }
