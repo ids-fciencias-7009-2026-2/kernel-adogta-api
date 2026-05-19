@@ -6,7 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface RazaRepository : JpaRepository<RazaEntity, Int> {
-	fun findByNombreIgnoreCaseAndTipoIgnoreCase(nombre: String, tipo: String): RazaEntity?
-
-	fun findAllByTipoIgnoreCase(tipo: String): List<RazaEntity>
+	fun findAllByTipo(tipo: String): List<RazaEntity>
 }

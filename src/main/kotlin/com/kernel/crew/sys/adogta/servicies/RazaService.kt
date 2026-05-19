@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 
 @Service
-class RazaSyncService(
+class RazaService(
     private val razaRepository: RazaRepository,
     @Value("\${app.thedogapi.base-url:https://api.thedogapi.com/v1}")
     private val dogBaseUrl: String,
@@ -29,7 +29,7 @@ class RazaSyncService(
     @Value("\${app.thecatapi.key:}")
     private val catApiKey: String
 ) {
-    private val logger = LoggerFactory.getLogger(RazaSyncService::class.java)
+    private val logger = LoggerFactory.getLogger(RazaService::class.java)
     private val restTemplate = RestTemplate()
 
     fun crearRaza(request: RazaCreateRequest): RazaResponse {
@@ -47,7 +47,7 @@ class RazaSyncService(
 
         val tipoBd = if (tipoEntrada == "perro") "Perro" else "Gato"
 
-        val existentes = razaRepository.findAllByTipoIgnoreCase(tipoBd)
+        val existentes = razaRepository.findAllByTipo(tipoBd)
         val razaExistente = existentes.firstOrNull {
             normalizar(it.nombre) == nombreNormalizado
         }
@@ -68,14 +68,14 @@ class RazaSyncService(
         return RazaResponse.from(guardada)
     }
 
-    private fun obtenerRazaPerro(nombreNormalizado: String, tipoBd: String): RazaEntity? {
-        val resultados = buscarRazasPerro(nombreNormalizado)
-        val match = resultados.firstOrNull { normalizar(it.name) == normalizar(nombreNormalizado) } ?: return null
+    private fun obtenerRazaPerro(nombre: String, tipoBd: String): RazaEntity? {
+        val resultados = buscarRazasPerro(nombre)
+        val match = resultados.firstOrNull { normalizar(it.name) == normalizar(nombre) } ?: return null
 
         val temperament = match.temperament ?: ""
-        val mapped = TemperamentMapper.mapTemperament(temperament)
-        val talla = match.weight?.metric?.let { TemperamentMapper.mapWeightToTalla(it) } ?: 3
-        val hipoalergenico = if (TemperamentMapper.HYPOALLERGENIC_DOG_BREEDS.contains(normalizar(match.name))) 1 else 0
+        val mapped = TemperamentMapper.mapearAtributos(temperament)
+        val talla = match.weight?.metric?.let { TemperamentMapper.mapPesoATalla(it) } ?: 3
+        val hipoalergenico = if (TemperamentMapper.RAZAS_PERRO_HIPOALERGENICAS.contains(normalizar(match.name))) 1 else 0
 
         return RazaEntity(
             nombre = match.name,
@@ -94,7 +94,7 @@ class RazaSyncService(
         val resultados = buscarRazasGato(nombre)
         val match = resultados.firstOrNull { normalizar(it.name) == normalizar(nombre) } ?: return null
 
-        val talla = match.weight?.metric?.let { TemperamentMapper.mapWeightToTalla(it) } ?: 3
+        val talla = match.weight?.metric?.let { TemperamentMapper.mapPesoATalla(it) } ?: 3
         val energia = match.energyLevel ?: 3
         val independencia = match.independence ?: 3
         val sociableNinos = match.childFriendly ?: 3
@@ -114,10 +114,10 @@ class RazaSyncService(
         )
     }
 
-    private fun buscarRazasPerro(nombreNormalizado: String): List<DogBreedSearchResponse> {
+    private fun buscarRazasPerro(nombre: String): List<DogBreedSearchResponse> {
         return try {
             val uri = UriComponentsBuilder.fromUriString("$dogBaseUrl/breeds/search")
-                .queryParam("q", nombreNormalizado)
+                .queryParam("q", nombre)
                 .build()
                 .encode()
                 .toUri()
@@ -134,10 +134,10 @@ class RazaSyncService(
         }
     }
 
-    private fun buscarRazasGato(nombreNormalizado: String): List<CatBreedSearchResponse> {
+    private fun buscarRazasGato(nombre: String): List<CatBreedSearchResponse> {
         return try {
             val uri = UriComponentsBuilder.fromUriString("$catBaseUrl/breeds/search")
-                .queryParam("q", nombreNormalizado)
+                .queryParam("q", nombre)
                 .build()
                 .encode()
                 .toUri()

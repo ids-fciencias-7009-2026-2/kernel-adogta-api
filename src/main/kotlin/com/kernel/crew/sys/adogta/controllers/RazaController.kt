@@ -3,7 +3,7 @@ package com.kernel.crew.sys.adogta.controllers
 import com.kernel.crew.sys.adogta.dto.request.RazaCreateRequest
 import com.kernel.crew.sys.adogta.dto.response.RazaResponse
 import com.kernel.crew.sys.adogta.repositories.RazaRepository
-import com.kernel.crew.sys.adogta.servicies.RazaSyncService
+import com.kernel.crew.sys.adogta.servicies.RazaService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -32,7 +32,7 @@ class RazaController {
     lateinit var razaRepository: RazaRepository
 
     @Autowired
-    lateinit var razaSyncService: RazaSyncService
+    lateinit var razaSyncService: RazaService
 
     /**
      * Retorna la lista completa de razas registradas en el sistema.
