@@ -9,9 +9,7 @@ class AdogtaApplication
 
 fun main(args: Array<String>) {
 
-	val dotenv = dotenv {
-		directory = "./kernel-adogta-api" // Le fuerza a buscar dentro de la carpeta de la API
-	}
+	val dotenv = dotenv()
 
 	System.setProperty("URL_DB", dotenv["URL_DB"])
 	System.setProperty("USER_DB", dotenv["USER_DB"])
