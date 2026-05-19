@@ -26,4 +26,12 @@ interface AnimalRepository : JpaRepository<AnimalEntity, AnimalId> {
      * @return Annimal(es) asociado.
      */
     fun findByIdPublicacion(idPublicacion: Int): List<AnimalEntity>
+
+    /**
+     * Busca un animal por su ID. La PK es compuesta, pero idAnimal proviene de una
+     * secuencia y es único en la práctica, por lo que se devuelve a lo sumo uno.
+     * @param idAnimal ID del animal.
+     * @return El animal si existe, null en caso contrario.
+     */
+    fun findByIdAnimal(idAnimal: Int): AnimalEntity?
 }
