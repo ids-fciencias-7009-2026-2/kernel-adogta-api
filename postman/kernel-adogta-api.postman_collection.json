@@ -217,9 +217,201 @@
 						"header": []
 					},
 					"response": []
+				}
+			]
+		},
+		{
+			"name": "Publicaciones",
+			"item": [
+				{
+					"name": "Pulicar",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bb914ecd-dcf6-4254-841d-f6bf5dc69e3d",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Max4\",\n    \"tipo\": \"Perro\",\n    \"edad\": 12,\n    \"descripcion\": \"Perro juguetón\",\n    \"codigoPostal\": \"06600\",\n    \"estadoVacunacion\": \"Completo\",\n    \"esterilizado\": true,\n    \"entrenado\": false,\n    \"idRaza\": 1,\n    \"fotos\": [\"/uploads/e73f7c7a-14fe-48dd-8cd1-1fc5739bfa68.png\"],\n    \"padecimientos\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/animales/publicar",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"animales",
+								"publicar"
+							]
+						}
+					},
+					"response": []
 				},
 				{
-					"name": "User - Pulicar",
+					"name": "Mis Publicaciones",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bb914ecd-dcf6-4254-841d-f6bf5dc69e3d",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/animales/mis-publicaciones",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"animales",
+								"mis-publicaciones"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Publication",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bb914ecd-dcf6-4254-841d-f6bf5dc69e3d",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Max Editado GOD\",\n    \"tipo\": \"Perro\",\n    \"edad\": 24,\n    \"descripcion\": \"Perro adulto, muy tranquilo y obediente. Ideal para familia.\",\n    \"codigoPostal\": \"11800\",\n    \"estadoVacunacion\": \"Completo\",\n    \"esterilizado\": true,\n    \"entrenado\": true,\n    \"idRaza\": 1,\n    \"overrideEnergia\": 2,\n    \"overrideIndependencia\": 3,\n    \"overrideSociableNiños\": 5,\n    \"overrideSociableMascotas\": 4,\n    \"padecimientos\": [\"Displasia leve\"],\n    \"fotos\": [\"/uploads/4521c37b-d37c-4769-b6b3-520d2b66125c.png\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/animales/2",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"animales",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Animales",
+			"item": [
+				{
+					"name": "Animal Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bb914ecd-dcf6-4254-841d-f6bf5dc69e3d",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/animales/2/editar",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"animales",
+								"2",
+								"editar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Animales",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/animales",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"animales"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Moderacion",
+			"item": [
+				{
+					"name": "User - Crear reporte",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "2c9fb58a-9a1e-4f10-abdf-1a4e32661941",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"idPublicacion\": 1,\n    \"motivo\": \"No es un perro el de la foto.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/reportes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"reportes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin  - Listar Reportes",
 					"request": {
 						"method": "GET",
 						"header": []
@@ -227,23 +419,51 @@
 					"response": []
 				},
 				{
-					"name": "User - Mis Publicaciones",
+					"name": "Admin - Resolver Reporte",
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "0ca57794-1225-4a3c-8508-0343be9e87d2",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"accion\": \"BAJA_PUBLICACION\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/admin/reportes/1/resolver",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"admin",
+								"reportes",
+								"1",
+								"resolver"
+							]
+						}
 					},
 					"response": []
 				},
 				{
-					"name": "User - Animal Detail",
-					"request": {
-						"method": "GET",
-						"header": []
-					},
-					"response": []
-				},
-				{
-					"name": "User - Edit Publication",
+					"name": "Admin -  Ban User",
 					"request": {
 						"method": "GET",
 						"header": []
