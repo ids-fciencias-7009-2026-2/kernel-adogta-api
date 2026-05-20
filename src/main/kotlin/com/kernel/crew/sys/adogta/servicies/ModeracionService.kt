@@ -39,23 +39,22 @@ class ModeracionService(
         val usuario = usuarioService.getAsEntity(token)
             ?: throw IllegalArgumentException("Token inválido")
 
+        // Verificar que la publicación exista
         val publicacion = publicacionRepository.findByIdPublicacion(request.idPublicacion)
             .firstOrNull()
             ?: throw IllegalArgumentException("Publicación no encontrada")
-        
-        if (publicacion.usuario?.id == usuario.id) {
-            throw IllegalArgumentException("No puedes reportar tu propia publicación")
-        }
 
-        if (reporteRepository.existsByUsuarioIdAndPublicacion(
-                usuario.id!!, request.idPublicacion, publicacion.idUsuario
-            ))
+        // No permitir reportarse a sí mismo
+        if (publicacion.usuario?.id == usuario.id)
+            throw IllegalArgumentException("No puedes reportar tu propia publicación")
+
+        // Verificar que no haya reportado ya esa publicación
+        if (reporteRepository.existsByUsuarioIdAndPublicacionId(usuario.id!!, request.idPublicacion))
             throw IllegalArgumentException("Ya reportaste esta publicación")
 
         val reporte = ReporteEntity(
             idUsuario = usuario.id!!,
             idPublicacion = request.idPublicacion,
-            idUsuarioPublicacion = publicacion.idUsuario,
             motivo = request.motivo,
             estado = "Pendiente",
             fecha = LocalDate.now()
@@ -105,9 +104,9 @@ class ModeracionService(
     fun resolverReporte(idReporte: Long, request: ResolverReporteRequest) {
         val reporte = reporteRepository.findById(idReporte)
             .orElseThrow { IllegalArgumentException("Reporte no encontrado") }
-        val publicacion = publicacionRepository.findByIdPublicacionAndIdUsuario(
-            reporte.idPublicacion, reporte.idUsuarioPublicacion
-        ) ?: throw IllegalArgumentException("Publicación asociada no encontrada")
+        val publicacion = publicacionRepository.findByIdPublicacion(reporte.idPublicacion)
+            .firstOrNull()
+            ?: throw IllegalArgumentException("Publicación asociada no encontrada")
         when (request.accion) {
             "DESESTIMAR" -> {
                 reporte.estado = "Desestimado"
@@ -125,15 +124,16 @@ class ModeracionService(
 
     /**
      * Banea a un usuario: crea el registro de ban, invalida su sesión
-     * y oculta sus publicaciones cambiando su estado a "Suspendida".
+     * y oculta sus publicaciones cambiando su estado a "Pausada".
      *
      * @param tokenAdmin Token de sesión del administrador que ejecuta la acción.
      * @param request    Datos del baneo (idUsuario, motivo).
+     * @return Email del usuario baneado.
      * @throws IllegalArgumentException si el token es inválido, el usuario no existe
      *         o ya está baneado.
      */
     @Transactional
-    fun banearUsuario(tokenAdmin: String, request: BanRequest) {
+    fun banearUsuario(tokenAdmin: String, request: BanRequest): String {
         val admin = usuarioService.getAsEntity(tokenAdmin)
             ?: throw IllegalArgumentException("Token de administrador inválido")
         val usuario = usuarioRepository.findById(request.idUsuario)
@@ -149,12 +149,15 @@ class ModeracionService(
         )
         banRepository.save(ban)
 
+        // Invalidar sesión del usuario baneado
         val usuarioActualizado = usuario.copy(tokenSesion = null, fechaExpiracionSesion = null)
         usuarioRepository.save(usuarioActualizado)
 
-        //borramos sus publicaciones.
+        // Ocultar sus publicaciones
         val publicaciones = publicacionRepository.findByIdUsuario(usuario.id!!.toInt())
-        publicaciones.forEach { it.estado = "Borrada" }
+        publicaciones.forEach { it.estado = "Pausada" }
         publicacionRepository.saveAll(publicaciones)
+
+        return usuario.email ?: "desconocido"
     }
 }

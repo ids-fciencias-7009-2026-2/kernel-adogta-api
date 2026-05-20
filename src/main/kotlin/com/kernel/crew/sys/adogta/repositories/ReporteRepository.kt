@@ -21,10 +21,9 @@ interface ReporteRepository : JpaRepository<ReporteEntity, Long> {
      * @param idPublicacion ID de la publicación.
      * @param idUsuarioPublicacion ID del dueño de la publicación.
      */
-    @Query("SELECT COUNT(r) > 0 FROM ReporteEntity r WHERE r.idUsuario = :idUsuario AND r.idPublicacion = :idPublicacion AND r.idUsuarioPublicacion = :idUsuarioPublicacion")
-    fun existsByUsuarioIdAndPublicacion(
+    @Query("SELECT COUNT(r) > 0 FROM ReporteEntity r WHERE r.idUsuario = :idUsuario AND r.idPublicacion = :idPublicacion")
+    fun existsByUsuarioIdAndPublicacionId(
         @Param("idUsuario") idUsuario: Long,
-        @Param("idPublicacion") idPublicacion: Int,
-        @Param("idUsuarioPublicacion") idUsuarioPublicacion: Int
+        @Param("idPublicacion") idPublicacion: Int
     ): Boolean
 }
