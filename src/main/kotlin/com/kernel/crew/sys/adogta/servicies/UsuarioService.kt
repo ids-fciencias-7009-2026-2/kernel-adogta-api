@@ -12,6 +12,8 @@ import com.kernel.crew.sys.adogta.repositories.UsuarioRepository
 import com.kernel.crew.sys.adogta.dto.request.ForgotPasswordRequest
 import com.kernel.crew.sys.adogta.dto.request.ResetPasswordRequest
 import com.kernel.crew.sys.adogta.dto.response.MessageResponse
+import com.kernel.crew.sys.adogta.repositories.AdministradorRepository
+import com.kernel.crew.sys.adogta.repositories.BanRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -38,6 +40,12 @@ class UsuarioService {
 
     @Autowired
     lateinit var emailService: EmailService
+
+    @Autowired
+    lateinit var administradorRepository: AdministradorRepository
+
+    @Autowired
+    lateinit var banRepository: BanRepository
 
     /**
      * Duración de la sesión deslizante en horas.
@@ -81,6 +89,12 @@ class UsuarioService {
         logger.info("Intento de login: ${request.email}")
 
         val usuario = usuarioRepository.findByEmail(request.email) ?: return null
+
+        // Si está baneado.
+        if (banRepository.existsByUsuarioId(usuario.id!!)) {
+            logger.warn("Intento de login de usuario baneado: ${request.email}")
+            return null
+        }
 
         val passwordHash = hashPassword(request.password)
         if (passwordHash != usuario.contrasena) return null
@@ -286,5 +300,15 @@ class UsuarioService {
             .getInstance("SHA-256")
             .digest(password.toByteArray())
         return bytes.joinToString("") { "%02x".format(it) }
+    }
+
+    /**
+     * Verifica si el usuario es administrador.
+     * @param token Token de sesión del usuario.
+     * @return si el usuario tiene privilegios de administrador.
+     */
+    fun esAdministrador(token: String): Boolean {
+        val usuario = getAsEntity(token) ?: return false
+        return administradorRepository.esAdministrador(usuario.email)
     }
 }
