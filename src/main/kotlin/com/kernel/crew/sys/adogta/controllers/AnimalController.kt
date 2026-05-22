@@ -41,6 +41,22 @@ class AnimalController {
     }
 
     /**
+     * Obtiene el detalle público de un animal por su ID.
+     *
+     * @param idAnimal ID del animal a consultar.
+     * @return 200 con [com.kernel.crew.sys.adogta.dto.response.AnimalListItemResponse],
+     *         o 404 si no existe o la publicación fue borrada.
+     */
+    @GetMapping("/{idAnimal}")
+    fun obtenerDetalleAnimal(@PathVariable idAnimal: Int): ResponseEntity<Any> {
+        logger.info("GET /api/animales/{}", idAnimal)
+        val animal = animalService.obtenerDetalleAnimal(idAnimal)
+            ?: return ResponseEntity.status(404)
+                .body(mapOf("error" to "Animal no encontrado con id: $idAnimal"))
+        return ResponseEntity.ok(animal)
+    }
+
+    /**
      * Publica un nuevo animal en adopción.
      *
      * @param token Token de sesión del usuario.
