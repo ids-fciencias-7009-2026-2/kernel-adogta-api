@@ -5,6 +5,8 @@ import com.kernel.crew.sys.adogta.dto.external.CatBreedSearchResponse
 import com.kernel.crew.sys.adogta.dto.external.DogBreedSearchResponse
 import com.kernel.crew.sys.adogta.dto.request.RazaCreateRequest
 import com.kernel.crew.sys.adogta.dto.response.RazaResponse
+import com.kernel.crew.sys.adogta.dto.request.LlmMapRequest
+import com.kernel.crew.sys.adogta.dto.response.LlmMapResponse
 import com.kernel.crew.sys.adogta.entities.RazaEntity
 import com.kernel.crew.sys.adogta.repositories.RazaRepository
 import org.slf4j.LoggerFactory
@@ -27,7 +29,9 @@ class RazaService(
     @Value("\${app.thedogapi.key:}")
     private val dogApiKey: String,
     @Value("\${app.thecatapi.key:}")
-    private val catApiKey: String
+    private val catApiKey: String,
+    @Value("\${app.llmapi.base-url:http://127.0.0.1:8000}")
+    private val llmBaseUrl: String,
 ) {
     private val logger = LoggerFactory.getLogger(RazaService::class.java)
     private val restTemplate = RestTemplate()
@@ -73,7 +77,13 @@ class RazaService(
         val match = resultados.firstOrNull { normalizar(it.name) == normalizar(nombre) } ?: return null
 
         val temperament = match.temperament ?: ""
-        val mapped = TemperamentMapper.mapearAtributos(temperament)
+        val llmResponse = mapearRasgosConLlm(LlmMapRequest(temperament))
+            ?: return null
+
+        val nivelEnergia = llmResponse.nivelEnergia.coerceIn(1, 5)
+        val sociableNinos = llmResponse.sociableNiños.coerceIn(1, 5)
+        val sociableMascotas = llmResponse.sociableMascotas.coerceIn(1, 5)
+        val independencia = llmResponse.independencia.coerceIn(1, 5)
         val talla = match.weight?.metric?.let { TemperamentMapper.mapPesoATalla(it) } ?: 3
         val hipoalergenico = if (TemperamentMapper.RAZAS_PERRO_HIPOALERGENICAS.contains(normalizar(match.name))) 1 else 0
 
@@ -81,11 +91,11 @@ class RazaService(
             nombre = match.name,
             tipo = tipoBd,
             talla = talla,
-            independencia = mapped.independencia,
-            nivelEnergia = mapped.nivelEnergia,
+            independencia = independencia,
+            nivelEnergia = nivelEnergia,
             personalidad = "",
-            sociableNiños = mapped.sociableNinos,
-            sociableMascotas = mapped.sociableMascotas,
+            sociableNiños = sociableNinos,
+            sociableMascotas = sociableMascotas,
             esHipoalergenico = hipoalergenico
         )
     }
@@ -151,6 +161,24 @@ class RazaService(
         } catch (ex: Exception) {
             logger.warn("Error consultando The Cat API: {}", ex.message)
             emptyList()
+        }
+    }
+
+    private fun mapearRasgosConLlm(request: LlmMapRequest): LlmMapResponse? {
+        return try {
+            val uri = UriComponentsBuilder.fromUriString("$llmBaseUrl/clasificar-temperamento")
+                .build()
+                .encode()
+                .toUri()
+            val response = restTemplate.postForEntity(
+                uri,
+                HttpEntity(request),
+                LlmMapResponse::class.java
+            )
+            response.body
+        } catch (ex: Exception) {
+            logger.warn("Error consultando LLM API: {}", ex.message)
+            null
         }
     }
 

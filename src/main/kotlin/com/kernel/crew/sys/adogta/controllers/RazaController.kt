@@ -32,7 +32,7 @@ class RazaController {
     lateinit var razaRepository: RazaRepository
 
     @Autowired
-    lateinit var razaSyncService: RazaService
+    lateinit var razaService: RazaService
 
     /**
      * Retorna la lista completa de razas registradas en el sistema.
@@ -74,7 +74,7 @@ class RazaController {
     fun agregarRaza(@RequestBody request: RazaCreateRequest): ResponseEntity<RazaResponse> {
         logger.info("POST /api/razas - tipo={} nombre={}", request.tipo, request.nombre)
 
-        val respuesta = razaSyncService.crearRaza(request)
+        val respuesta = razaService.crearRaza(request)
         return if (respuesta.mensaje != null) {
             ResponseEntity.status(404).body(respuesta)
         } else {
