@@ -52,20 +52,18 @@ INSERT INTO Usuario (
 );
 
 -- -------------------------------------------------------------
--- Administrador de prueba
+-- Administradores de prueba
 -- Email:      admin@adogta.com
 -- Contraseña: 1234  (SHA-256: 03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4)
 -- -------------------------------------------------------------
-INSERT INTO administrador (
-    email, 
-    contrasena, 
-    nombres, 
-    apellido_paterno)
-VALUES (
-    'admin@adogta.com', 
-    '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 
-    'Admin', 
-    'Principal');
+INSERT INTO administrador (email, contrasena, nombres, apellido_paterno)
+VALUES 
+    ('marco-rubio@adogta.com',   '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Marco',     'Rubio'),
+    ('daniela@adogta.com',       '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Daniela',   'Flores'),
+    ('patricio@adogta.com',      '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Patricio',  'Castillo'),
+    ('luis@adogta.com',          '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Luis',      'Carrillo'),
+    ('marco-raya@adogta.com',    '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Marco',     'Raya'),
+    ('karla@adogta.com',         '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Karla',     'García');
 
 -- -------------------------------------------------------------
 -- Razas de prueba (10 perros, 10 gatos)

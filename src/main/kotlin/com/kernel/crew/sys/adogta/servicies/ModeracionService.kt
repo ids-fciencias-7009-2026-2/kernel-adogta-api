@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 /**
- * Servicio que contiene la lógica de negocio relacionada con la moderación
+ * Servicio que contiene la lógica relacionada con la moderación
  * de publicaciones y usuarios (reportes y baneos).
  */
 @Service

@@ -4,7 +4,7 @@ import com.kernel.crew.sys.adogta.dto.request.BanRequest
 import com.kernel.crew.sys.adogta.dto.request.ReporteRequest
 import com.kernel.crew.sys.adogta.dto.request.ResolverReporteRequest
 import com.kernel.crew.sys.adogta.servicies.ModeracionService
-import com.kernel.crew.sys.adogta.servicies.UsuarioService
+import com.kernel.crew.sys.adogta.servicies.AdministradorService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.*
  * Controlador REST para las operaciones de moderación (reportes y baneos).
  *
  * Expone los endpoints:
- * Cualquier usuario:
- * - POST /api/reportes (cualquier usuario autenticado)
- * Solo admins:
- * - GET  /api/admin/reportes
- * - PUT  /api/admin/reportes/{idReporte}/resolver
- * - POST /api/admin/baneos
+ * Usuarios:
+ * - POST /api/reportes 
+ * Administradores:
+ * - GET  /api/admin/reportes 
+ * - PUT  /api/admin/reportes/{idReporte}/resolver 
+ * - POST /api/admin/baneos 
  */
 @RestController
 @RequestMapping("/api")
 class ModeracionController(
     private val moderacionService: ModeracionService,
-    private val usuarioService: UsuarioService
+    private val administradorService: AdministradorService
 ) {
 
     private val logger = LoggerFactory.getLogger(ModeracionController::class.java)
@@ -65,7 +65,7 @@ class ModeracionController(
     ): ResponseEntity<Any> {
         logger.info("GET /api/admin/reportes")
         if (token == null) return ResponseEntity.status(401).build()
-        if (!usuarioService.esAdministrador(token)) return ResponseEntity.status(403).build()
+        if (administradorService.validarToken(token) == null) return ResponseEntity.status(403).build()
         return try {
             ResponseEntity.ok(moderacionService.listarReportesPendientes())
         } catch (e: Exception) {
@@ -89,7 +89,7 @@ class ModeracionController(
     ): ResponseEntity<Any> {
         logger.info("PUT /api/admin/reportes/{}/resolver", idReporte)
         if (token == null) return ResponseEntity.status(401).build()
-        if (!usuarioService.esAdministrador(token)) return ResponseEntity.status(403).build()
+        if (administradorService.validarToken(token) == null) return ResponseEntity.status(403).build()
         return try {
             moderacionService.resolverReporte(idReporte, request)
             ResponseEntity.ok(mapOf("mensaje" to "Reporte resuelto"))
@@ -103,7 +103,7 @@ class ModeracionController(
      *
      * @param token   Token de sesión del administrador.
      * @param request Datos del baneo (idUsuario, motivo).
-     * @return 201, 403 si no es admin, 401 sin token.
+     * @return 201 y mensaje con el email del usuario baneado, 403 si no es admin, 401 sin token.
      */
     @PostMapping("/admin/baneos")
     fun banearUsuario(
@@ -112,7 +112,7 @@ class ModeracionController(
     ): ResponseEntity<Any> {
         logger.info("POST /api/admin/baneos")
         if (token == null) return ResponseEntity.status(401).build()
-        if (!usuarioService.esAdministrador(token)) return ResponseEntity.status(403).build()
+        if (administradorService.validarToken(token) == null) return ResponseEntity.status(403).build()
         return try {
             val email = moderacionService.banearUsuario(token, request)
             ResponseEntity.status(HttpStatus.CREATED).body(

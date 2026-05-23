@@ -80,29 +80,27 @@ COMMENT ON CONSTRAINT chk_googleid_fmt   ON Usuario IS 'El google_id debe ser nu
 -- Tabla: Administrador
 -- -------------------------------------------------------------
 CREATE TABLE Administrador (
-    id_administrador SERIAL PRIMARY KEY,
-    email            VARCHAR(150) NOT NULL,
-    contrasena       VARCHAR(255) NOT NULL,
-    nombres          VARCHAR(100) NOT NULL,
-    apellido_paterno VARCHAR(100) NOT NULL,
-    apellido_materno VARCHAR(100) NULL,
-
-    CONSTRAINT chk_admin_email CHECK (email ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$'),
-    CONSTRAINT chk_admin_pass  CHECK (length(contrasena) >= 8)
+    id_administrador            SERIAL PRIMARY KEY,
+    email                       VARCHAR(150) NOT NULL,
+    contrasena                  VARCHAR(255) NOT NULL,
+    nombres                     VARCHAR(100) NOT NULL,
+    apellido_paterno            VARCHAR(100) NOT NULL,
+    apellido_materno            VARCHAR(100) NULL,
+    token_sesion                VARCHAR(255) NULL,
+    fecha_expiracion_sesion     TIMESTAMP NULL
 );
 
-COMMENT ON TABLE Administrador IS 'Usuario con privilegios de moderación. Tiene acceso a funcionalidades restringidas como revisión de reportes y baneo de usuarios.';
+COMMENT ON TABLE Administrador IS
+'Usuario con privilegios de moderación. Tiene acceso a funcionalidades restringidas como revisión de reportes y baneo de usuarios.';
 
-COMMENT ON COLUMN Administrador.id_administrador IS 'Identificador único del administrador. Generado automáticamente por la base de datos.';
-COMMENT ON COLUMN Administrador.email            IS 'Correo electrónico del administrador. Usado como credencial de acceso.';
-COMMENT ON COLUMN Administrador.contrasena       IS 'Contraseña del administrador. Mínimo 8 caracteres.';
-COMMENT ON COLUMN Administrador.nombres          IS 'Nombre(s) del administrador.';
-COMMENT ON COLUMN Administrador.apellido_paterno IS 'Primer apellido del administrador.';
-COMMENT ON COLUMN Administrador.apellido_materno IS 'Segundo apellido del administrador. Opcional.';
-
-COMMENT ON CONSTRAINT chk_admin_email ON Administrador IS 'El email debe tener formato válido según expresión regular.';
-COMMENT ON CONSTRAINT chk_admin_pass  ON Administrador IS 'La contraseña debe tener al menos 8 caracteres.';
-
+COMMENT ON COLUMN Administrador.id_administrador          IS 'Identificador único del administrador. Generado automáticamente.';
+COMMENT ON COLUMN Administrador.email                      IS 'Correo electrónico del administrador. Usado como credencial de acceso.';
+COMMENT ON COLUMN Administrador.contrasena                IS 'Contraseña del administrador. Mínimo 8 caracteres.';
+COMMENT ON COLUMN Administrador.nombres                   IS 'Nombre(s) del administrador.';
+COMMENT ON COLUMN Administrador.apellido_paterno          IS 'Primer apellido del administrador.';
+COMMENT ON COLUMN Administrador.apellido_materno          IS 'Segundo apellido del administrador. Opcional.';
+COMMENT ON COLUMN Administrador.token_sesion              IS 'Token de sesión activo generado al autenticarse. NULL cuando no hay sesión activa.';
+COMMENT ON COLUMN Administrador.fecha_expiracion_sesion   IS 'Fecha y hora de expiración del token de sesión activo.';
 
 -- -------------------------------------------------------------
 -- Tabla: Raza

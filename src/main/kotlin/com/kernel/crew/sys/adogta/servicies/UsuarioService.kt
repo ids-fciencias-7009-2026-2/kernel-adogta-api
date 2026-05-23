@@ -302,13 +302,4 @@ class UsuarioService {
         return bytes.joinToString("") { "%02x".format(it) }
     }
 
-    /**
-     * Verifica si el usuario es administrador.
-     * @param token Token de sesión del usuario.
-     * @return si el usuario tiene privilegios de administrador.
-     */
-    fun esAdministrador(token: String): Boolean {
-        val usuario = getAsEntity(token) ?: return false
-        return administradorRepository.esAdministrador(usuario.email)
-    }
 }

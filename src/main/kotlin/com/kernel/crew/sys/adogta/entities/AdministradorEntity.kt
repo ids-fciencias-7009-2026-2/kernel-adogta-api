@@ -1,6 +1,7 @@
 package com.kernel.crew.sys.adogta.entities
 
 import jakarta.persistence.*
+import java.time.LocalDateTime
 
 /**
  * Entidad JPA que mapea la tabla [administrador] en la base de datos.
@@ -34,5 +35,13 @@ data class AdministradorEntity(
 
     /** Apellido materno del administrador. */
     @Column(name = "apellido_materno", length = 100)
-    var apellidoMaterno: String? = null
+    var apellidoMaterno: String? = null,
+
+    /** Token de sesión activo para administradores. */
+    @Column(name = "token_sesion", length = 255)
+    var tokenSesion: String? = null,
+
+    /** Fecha y hora de expiración del token de sesión. */
+    @Column(name = "fecha_expiracion_sesion")
+    var fechaExpiracionSesion: LocalDateTime? = null
 )
