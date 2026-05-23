@@ -66,6 +66,7 @@ INSERT INTO Raza (nombre, tipo, talla, independencia, nivel_energia, personalida
 ('Bulldog Francés',    'Perro', 2, 4, 3, 'Gentil, afectuoso y tranquilo',              4, 3, 0),
 ('Border Collie',      'Perro', 4, 3, 5, 'Leal, obediente y activo',                   4, 4, 0),
 ('Bichón Frisé',       'Perro', 3, 3, 3, 'Juguetón, sociable y cariñoso',              5, 5, 1),
+('Sin Raza Especifica',          'Gato', 3, 3, 3, '',                                 3, 3, 0),
 ('Persa',              'Gato',  2, 4, 2, 'Tranquilo, cariñoso, de bajo mantenimiento', 3, 3, 0),
 ('Siamés',             'Gato',  2, 3, 4, 'Vocal, curioso, muy social',                 4, 3, 0),
 ('Maine Coon',         'Gato',  4, 3, 3, 'Gentil gigante, amistoso',                   5, 4, 0),
