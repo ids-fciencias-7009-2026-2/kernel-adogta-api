@@ -105,4 +105,21 @@ class SmtpEmailService(
         mailSender.send(mensaje)
         logger.info("Correo de solicitud de adopción enviado a $destinatario (animal: $nombreAnimal)")
     }
+
+    
+    override fun enviarNotificacionBaneo(destinatario: String, motivo: String) {
+        val context = Context().apply {
+            setVariable("motivo", motivo)
+        }
+        val contenidoHtml = templateEngine.process("email-baneo", context)
+    
+        val mensaje = mailSender.createMimeMessage()
+        val helper = MimeMessageHelper(mensaje, true, "UTF-8")
+        helper.setTo(destinatario)
+        helper.setSubject("Tu cuenta ha sido suspendida - Adogta")
+        helper.setText(contenidoHtml, true)
+    
+        mailSender.send(mensaje)
+        logger.info("Correo de baneo enviado a $destinatario")
+    }
 }

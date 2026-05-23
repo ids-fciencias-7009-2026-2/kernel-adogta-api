@@ -87,8 +87,6 @@ class AdministradorService(
         admin.tokenSesion = null
         admin.fechaExpiracionSesion = null
         administradorRepository.save(admin)
-
-        logger.info("Sesión de administrador cerrada correctamente")
     }
 
     /**

@@ -38,4 +38,14 @@ interface EmailService {
         emailAdoptante: String,
         telefonoAdoptante: String?
     )
+
+    /**
+     * Corrreo de notificación de usuario baneado
+     * 
+     * Manda un mensaej en HTML que le expresa al usuario las razones de la suspensión de su cuenta.
+     * 
+     * @param destinatario  Correo electŕonico del usuario baneado.
+     * @param motivo        Descripción de las razones del baneo.
+     */
+    fun enviarNotificacionBaneo(destinatario: String, motivo: String)
 }

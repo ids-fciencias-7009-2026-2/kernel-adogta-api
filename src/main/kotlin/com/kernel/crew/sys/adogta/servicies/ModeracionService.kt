@@ -7,23 +7,28 @@ import com.kernel.crew.sys.adogta.dto.response.ReporteResponse
 import com.kernel.crew.sys.adogta.entities.BanEntity
 import com.kernel.crew.sys.adogta.entities.ReporteEntity
 import com.kernel.crew.sys.adogta.repositories.*
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 /**
- * Servicio que contiene la lógica relacionada con la moderación
+ * Servicio que contiene la lógica de negocio relacionada con la moderación
  * de publicaciones y usuarios (reportes y baneos).
  */
 @Service
 class ModeracionService(
     private val usuarioService: UsuarioService,
+    private val administradorService: AdministradorService,
     private val usuarioRepository: UsuarioRepository,
     private val reporteRepository: ReporteRepository,
     private val banRepository: BanRepository,
     private val publicacionRepository: PublicacionRepository,
-    private val animalRepository: AnimalRepository
+    private val animalRepository: AnimalRepository,
+    private val emailService: EmailService
 ) {
+
+    private val logger = LoggerFactory.getLogger(ModeracionService::class.java)
 
     /**
      * Crea un reporte sobre una publicación.
@@ -36,21 +41,22 @@ class ModeracionService(
      */
     @Transactional
     fun crearReporte(token: String, request: ReporteRequest): ReporteResponse {
+        logger.info("Creando reporte para publicación ${request.idPublicacion}")
+
         val usuario = usuarioService.getAsEntity(token)
             ?: throw IllegalArgumentException("Token inválido")
 
-        // Verificar que la publicación exista
         val publicacion = publicacionRepository.findByIdPublicacion(request.idPublicacion)
             .firstOrNull()
             ?: throw IllegalArgumentException("Publicación no encontrada")
 
-        // No permitir reportarse a sí mismo
-        if (publicacion.usuario?.id == usuario.id)
+        if (publicacion.usuario?.id == usuario.id) {
             throw IllegalArgumentException("No puedes reportar tu propia publicación")
+        }
 
-        // Verificar que no haya reportado ya esa publicación
-        if (reporteRepository.existsByUsuarioIdAndPublicacionId(usuario.id!!, request.idPublicacion))
+        if (reporteRepository.existsByUsuarioIdAndPublicacionId(usuario.id!!, request.idPublicacion)) {
             throw IllegalArgumentException("Ya reportaste esta publicación")
+        }
 
         val reporte = ReporteEntity(
             idUsuario = usuario.id!!,
@@ -60,6 +66,8 @@ class ModeracionService(
             fecha = LocalDate.now()
         )
         val guardado = reporteRepository.save(reporte)
+
+        logger.info("Reporte creado: id=${guardado.idReporte}, publicación=${request.idPublicacion}")
 
         val animal = animalRepository.findByIdPublicacion(request.idPublicacion).firstOrNull()
         return ReporteResponse(
@@ -102,11 +110,14 @@ class ModeracionService(
      */
     @Transactional
     fun resolverReporte(idReporte: Long, request: ResolverReporteRequest) {
+        logger.info("Resolviendo reporte $idReporte con acción ${request.accion}")
+
         val reporte = reporteRepository.findById(idReporte)
             .orElseThrow { IllegalArgumentException("Reporte no encontrado") }
         val publicacion = publicacionRepository.findByIdPublicacion(reporte.idPublicacion)
             .firstOrNull()
             ?: throw IllegalArgumentException("Publicación asociada no encontrada")
+
         when (request.accion) {
             "DESESTIMAR" -> {
                 reporte.estado = "Desestimado"
@@ -123,8 +134,8 @@ class ModeracionService(
     }
 
     /**
-     * Banea a un usuario: crea el registro de ban, invalida su sesión
-     * y oculta sus publicaciones cambiando su estado a "Pausada".
+     * Banea a un usuario: crea el registro de ban, invalida su sesión,
+     * oculta sus publicaciones y envía un correo de notificación.
      *
      * @param tokenAdmin Token de sesión del administrador que ejecuta la acción.
      * @param request    Datos del baneo (idUsuario, motivo).
@@ -134,8 +145,12 @@ class ModeracionService(
      */
     @Transactional
     fun banearUsuario(tokenAdmin: String, request: BanRequest): String {
-        val admin = usuarioService.getAsEntity(tokenAdmin)
+        logger.info("Baneo de usuario ${request.idUsuario} por administrador")
+
+        // Validar token de administrador y obtener sus datos
+        val admin = administradorService.validarToken(tokenAdmin)
             ?: throw IllegalArgumentException("Token de administrador inválido")
+
         val usuario = usuarioRepository.findById(request.idUsuario)
             .orElseThrow { IllegalArgumentException("Usuario no encontrado") }
         if (banRepository.existsByUsuarioId(usuario.id!!))
@@ -157,6 +172,14 @@ class ModeracionService(
         val publicaciones = publicacionRepository.findByIdUsuario(usuario.id!!.toInt())
         publicaciones.forEach { it.estado = "Pausada" }
         publicacionRepository.saveAll(publicaciones)
+
+        // Enviar correo de notificación
+        try {
+            emailService.enviarNotificacionBaneo(usuario.email ?: "", request.motivo)
+            logger.info("Correo de baneo enviado a ${usuario.email}")
+        } catch (e: Exception) {
+            logger.error("No se pudo enviar el correo de baneo a ${usuario.email}: ${e.message}")
+        }
 
         return usuario.email ?: "desconocido"
     }

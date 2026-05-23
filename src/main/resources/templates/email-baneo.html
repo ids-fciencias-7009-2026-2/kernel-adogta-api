@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cuenta suspendida</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #FCF6F0; margin: 0; padding: 20px;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td align="center">
+                <table width="500" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <tr>
+                        <td style="background-color: #4A728F; padding: 20px; text-align: center;">
+                            <h1 style="color: #FFFFFF; margin: 0; font-size: 24px;">Adogta</h1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 30px;">
+                            <h2 style="color: #4A728F; font-size: 20px;">Tu cuenta ha sido suspendida</h2>
+                            <p style="color: #4A728F; font-size: 16px; line-height: 1.5;">
+                                Hola,<br><br>
+                                Lamentamos informarte que tu cuenta en <strong>Adogta</strong> ha sido suspendida por infringir nuestras normas comunitarias.
+                            </p>
+                            <p style="color: #4A728F; font-size: 16px; line-height: 1.5;">
+                                <strong>Motivo:</strong> <span th:text="${motivo}">No especificado</span>
+                            </p>
+                            <p style="color: #4A728F; font-size: 16px; line-height: 1.5;">
+                                Si consideras que se trata de un error, por favor contacta con nuestro equipo de soporte.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #FCF6F0; padding: 15px; text-align: center; border-top: 1px solid #CBD5E1;">
+                            <p style="margin: 0; font-size: 12px; color: #CBD5E1;">
+                                &copy; 2026 Adogta. Todos los derechos reservados.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

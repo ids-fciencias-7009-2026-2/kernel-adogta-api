@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Recuperación de contraseña</title>
+    <title>Cuenta suspendida</title>
 </head>
 <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
     <table width="100%" cellpadding="0" cellspacing="0">
@@ -16,25 +16,21 @@
                     </tr>
                     <tr>
                         <td style="padding: 30px;">
-                            <h2 style="color: #333333; font-size: 20px;">Restablece tu contraseña</h2>
+                            <h2 style="color: #333333; font-size: 20px;">Tu cuenta ha sido suspendida</h2>
                             <p style="color: #555555; font-size: 16px; line-height: 1.5;">
                                 Hola,<br><br>
-                                Hemos recibido una solicitud para restablecer la contraseña de tu cuenta en <strong>Adogta</strong>.
-                                Haz clic en el botón de abajo para crear una nueva contraseña:
+                                Lamentamos informarte que tu cuenta en <strong>Adogta</strong> ha sido suspendida por infringir nuestras normas comunitarias.
                             </p>
-                            <table cellpadding="0" cellspacing="0" style="margin: 25px 0;">
-                                <tr>
-                                    <td align="center" bgcolor="#F4A26C" style="border-radius: 4px;">
-                                        <a th:href="${enlace}" target="_blank" style="display: inline-block; padding: 12px 30px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: bold;">
-                                            Restablecer contraseña
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
+                            <p style="color: #555555; font-size: 16px; line-height: 1.5;">
+                                <strong>Motivo de la suspensión:</strong><br>
+                                <span th:text="${motivo}" style="color: #F4A26C;">No especificado</span>
+                            </p>
+                            <p style="color: #555555; font-size: 16px; line-height: 1.5;">
+                                Si consideras que se trata de un error, por favor contacta con nuestro equipo de soporte para revisar tu caso.
+                            </p>
                             <p style="color: #888888; font-size: 12px;">
-                                Si no solicitaste este cambio, puedes ignorar este mensaje y tu contraseña permanecerá igual.
+                                Esta es una notificación automática. Por favor, no respondas a este correo.
                             </p>
-                            <p style="color: #888888; font-size: 12px;">Este enlace expirará en 1 hora.</p>
                         </td>
                     </tr>
                     <tr>
