@@ -4,8 +4,10 @@ import com.kernel.crew.sys.adogta.entities.UsuarioEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 /**
  * Repositorio JPA para la entidad [UsuarioEntity].
@@ -43,5 +45,9 @@ interface UsuarioRepository : JpaRepository<UsuarioEntity, Long> {
     @Query("UPDATE usuario SET envio_formulario = :estado WHERE token_sesion = :token",
         nativeQuery = true)
     fun updateCuestionarioStatus(token: String, estado: Boolean): Int
+
+    @Query("SELECT envio_formulario FROM usuario WHERE id_usuario = :id_usuario",
+        nativeQuery = true)
+    fun getEnvioFormulario(@Param("id_usuario") id_usuario: Long): Boolean?
 
 }

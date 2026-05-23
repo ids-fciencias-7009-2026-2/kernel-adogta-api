@@ -21,5 +21,8 @@ fun main(args: Array<String>) {
 	System.setProperty("MAIL_PASSWORD", dotenv["MAIL_PASSWORD"])
 	System.setProperty("APP_BASE_URL", dotenv["APP_BASE_URL"])
 
+	System.setProperty("DOG_API_KEY", dotenv["DOG_API_KEY"])
+	System.setProperty("CAT_API_KEY", dotenv["CAT_API_KEY"])
+
 	runApplication<AdogtaApplication>(*args)
 }
