@@ -55,7 +55,8 @@ INSERT INTO Usuario (
 -- Razas de prueba (10 perros, 10 gatos)
 -- -------------------------------------------------------------
 INSERT INTO Raza (nombre, tipo, talla, independencia, nivel_energia, personalidad, sociable_niños, sociable_mascotas, es_hipoalergenico) VALUES
-('Chihuahua',          'Perro', 1, 4, 4, 'Vivaz, alerta, valiente',                   2, 2, 0),
+('Sin Raza Especifica',          'Perro', 3, 3, 3, '',                                 3, 3, 0),
+('Chihuahua',          'Perro', 1, 4, 4, 'Vivaz, alerta, valiente',                    2, 2, 0),
 ('Pastor Alemán',      'Perro', 5, 3, 5, 'Inteligente, protector y trabajador',        4, 3, 0),
 ('Poodle',             'Perro', 3, 3, 4, 'Listo, elegante, hipoalergénico',            5, 4, 1),
 ('Beagle',             'Perro', 2, 3, 4, 'Curioso y sociable',                         5, 5, 0),
