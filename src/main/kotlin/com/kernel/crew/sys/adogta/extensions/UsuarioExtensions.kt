@@ -91,7 +91,8 @@ fun Usuario.toResponse(): UsuarioResponse {
         codigoPostal = this.codigoPostal,
         telefono = this.telefono,
         proveedorAutenticacion = this.proveedorAutenticacion,
-        aceptaTerminos = this.aceptaTerminos
+        aceptaTerminos = this.aceptaTerminos,
+        envioFormulario = this.envioFormulario
     )
 }
 
