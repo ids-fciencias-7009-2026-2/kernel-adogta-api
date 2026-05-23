@@ -51,12 +51,6 @@ class RazaService(
 
         val tipoBd = if (tipoEntrada == "perro") "Perro" else "Gato"
 
-        val existentes = razaRepository.findAllByTipo(tipoBd)
-        val razaExistente = existentes.firstOrNull {
-            normalizar(it.nombre) == nombreNormalizado
-        }
-        if (razaExistente != null) return RazaResponse.from(razaExistente)
-
         val razaNueva = if (tipoEntrada == "perro") {
             obtenerRazaPerro(nombreNormalizado, tipoBd)
         } else {
