@@ -15,6 +15,9 @@ interface ReporteRepository : JpaRepository<ReporteEntity, Long> {
     /** Lista los reportes filtrados por estado. */
     fun findByEstado(estado: String): List<ReporteEntity>
 
+    /** Cuenta los reportes a una publicacion mediante los parámetros idPublicacion y estado*/
+    fun countByIdPublicacionAndEstado(idPublicacion: Int, estado: String): Int
+
     /**
      * Verifica si un usuario ya reportó una publicación específica.
      * @param idUsuario ID del usuario que reporta.
@@ -26,4 +29,15 @@ interface ReporteRepository : JpaRepository<ReporteEntity, Long> {
         @Param("idUsuario") idUsuario: Long,
         @Param("idPublicacion") idPublicacion: Int
     ): Boolean
+
+    /**
+     * Devuelve los reportes de publicaciones que están en estado "En revision".
+     * Usa un join implícito aprovechando la FK compuesta.
+     */
+    @Query("SELECT r FROM ReporteEntity r, PublicacionEntity p " +
+        "WHERE r.idPublicacion = p.idPublicacion " +
+        "AND r.idUsuarioPublicacion = p.idUsuario " +
+        "AND p.estado = 'En revision'")
+    fun findReportesDePublicacionesEnRevision(): List<ReporteEntity>
+
 }

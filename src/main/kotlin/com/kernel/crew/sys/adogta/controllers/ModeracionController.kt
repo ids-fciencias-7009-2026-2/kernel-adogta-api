@@ -67,7 +67,7 @@ class ModeracionController(
         if (token == null) return ResponseEntity.status(401).build()
         if (administradorService.validarToken(token) == null) return ResponseEntity.status(403).build()
         return try {
-            ResponseEntity.ok(moderacionService.listarReportesPendientes())
+            ResponseEntity.ok(moderacionService.listarReportesParaAdmin())
         } catch (e: Exception) {
             ResponseEntity.status(400).body(mapOf("error" to e.message))
         }

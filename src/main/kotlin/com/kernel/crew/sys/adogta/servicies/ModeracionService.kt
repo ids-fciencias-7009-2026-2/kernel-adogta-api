@@ -28,7 +28,11 @@ class ModeracionService(
     private val emailService: EmailService
 ) {
 
+
     private val logger = LoggerFactory.getLogger(ModeracionService::class.java)
+
+    /* Umbral de reportes para que una publicacion deba ser revisada.*/
+    companion object { private const val UMBRAL_REPORTES = 2 }
 
     /**
      * Crea un reporte sobre una publicación.
@@ -69,6 +73,14 @@ class ModeracionService(
 
         logger.info("Reporte creado: id=${guardado.idReporte}, publicación=${request.idPublicacion}")
 
+        // Verificar si la publicación alcanzó el umbral para pasar a revisión.
+        val totalReportes = reporteRepository.countByIdPublicacionAndEstado(request.idPublicacion, "Pendiente")
+        if (totalReportes >= UMBRAL_REPORTES && publicacion.estado == "Activa") {
+            publicacion.estado = "En revision"
+            publicacionRepository.save(publicacion)
+            logger.info("Publicación ${request.idPublicacion} pasó a 'En revision' ($totalReportes reportes)")
+        }
+
         val animal = animalRepository.findByIdPublicacion(request.idPublicacion).firstOrNull()
         return ReporteResponse(
             idReporte = guardado.idReporte,
@@ -86,8 +98,9 @@ class ModeracionService(
      * @return Lista de [ReporteResponse].
      */
     @Transactional(readOnly = true)
-    fun listarReportesPendientes(): List<ReporteResponse> {
-        return reporteRepository.findByEstado("Pendiente").map { reporte ->
+    fun listarReportesParaAdmin(): List<ReporteResponse> {
+        logger.info("Listando reportes para el panel de administración")
+        return reporteRepository.findReportesDePublicacionesEnRevision().map { reporte ->
             val animal = animalRepository.findByIdPublicacion(reporte.idPublicacion).firstOrNull()
             ReporteResponse(
                 idReporte = reporte.idReporte,
@@ -176,7 +189,7 @@ class ModeracionService(
 
         // Ocultar sus publicaciones
         val publicaciones = publicacionRepository.findByIdUsuario(usuario.id!!.toInt())
-        publicaciones.forEach { it.estado = "Suspndida" }
+        publicaciones.forEach { it.estado = "Suspendida" }
         publicacionRepository.saveAll(publicaciones)
 
         // Enviar correo de notificación
