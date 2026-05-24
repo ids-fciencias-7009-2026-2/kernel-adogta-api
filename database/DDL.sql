@@ -158,16 +158,16 @@ CREATE TABLE Publicacion (
     PRIMARY KEY (id_publicacion, id_usuario),
     FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario),
 
-    CONSTRAINT chk_estado_publicacion CHECK (estado IN ('Activa', 'Pausada', 'Cerrada', 'Borrada'))
+    CONSTRAINT chk_estado_publicacion CHECK (estado IN ('Activa', 'Pausada', 'Cerrada', 'Borrada', 'En revision', 'Suspendida'))
 );
 
 COMMENT ON TABLE Publicacion IS 'Representa una oferta de adopción creada por un donante. Contiene el estado del proceso y está vinculada a un animal.';
 
 COMMENT ON COLUMN Publicacion.id_publicacion IS 'Identificador de la publicación. Parte de la llave primaria compuesta.';
 COMMENT ON COLUMN Publicacion.id_usuario     IS 'Usuario donante que creó la publicación. Parte de la llave primaria compuesta.';
-COMMENT ON COLUMN Publicacion.estado         IS 'Estado actual de la publicación: Activa, Pausada, Cerrada o Borrada.';
+COMMENT ON COLUMN Publicacion.estado         IS 'Estado actual de la publicación: Activa, Pausada, Cerrada, Borrada, En revision o Suspendidas.';
 
-COMMENT ON CONSTRAINT chk_estado_publicacion ON Publicacion IS 'Solo se permiten los estados definidos en el dominio del negocio: Activa, Pausada, Cerrada, Borrada.';
+COMMENT ON CONSTRAINT chk_estado_publicacion ON Publicacion IS 'Solo se permiten los estados definidos en el dominio del negocio: Activa, Pausada, Cerrada, Borrada, En revision, Suspendida';
 
 
 -- -------------------------------------------------------------
@@ -373,18 +373,19 @@ COMMENT ON CONSTRAINT chk_donante_consistente ON Contrato IS 'El donante del con
 -- Tabla: Reporte
 -- -------------------------------------------------------------
 CREATE TABLE Reporte (
-    id_reporte       SERIAL,
-    id_usuario       INT,                 
-    id_publicacion   INT,                
-    estado           VARCHAR(50),
-    fecha            DATE,
-    motivo           TEXT,
-    id_administrador INT,
+    id_reporte              SERIAL,
+    id_usuario              INT,                  
+    id_publicacion          INT,                  
+    id_usuario_publicacion  INT,                 
+    estado                  VARCHAR(50),
+    fecha                   DATE,
+    motivo                  TEXT,
+    id_administrador        INT,
 
     PRIMARY KEY (id_reporte, id_usuario, id_publicacion),
-    FOREIGN KEY (id_usuario)       REFERENCES Usuario(id_usuario),
-    FOREIGN KEY (id_publicacion)   REFERENCES Publicacion(id_publicacion),
-    FOREIGN KEY (id_administrador) REFERENCES Administrador(id_administrador),
+    FOREIGN KEY (id_usuario)                          REFERENCES Usuario(id_usuario),
+    FOREIGN KEY (id_publicacion, id_usuario_publicacion) REFERENCES Publicacion(id_publicacion, id_usuario),
+    FOREIGN KEY (id_administrador)                    REFERENCES Administrador(id_administrador),
 
     CONSTRAINT chk_estado_reporte CHECK (
         estado IN ('Pendiente', 'En Revisión', 'Atendido', 'Desestimado')
@@ -395,14 +396,17 @@ COMMENT ON TABLE Reporte IS
 'Registro de denuncias realizadas por usuarios sobre una publicación. '
 'Un administrador revisa y gestiona cada reporte.';
 
-COMMENT ON COLUMN Reporte.id_reporte       IS 'Identificador del reporte. Parte de la llave primaria compuesta.';
-COMMENT ON COLUMN Reporte.id_usuario       IS 'Usuario que realizó la denuncia. Parte de la llave primaria compuesta.';
-COMMENT ON COLUMN Reporte.id_publicacion   IS 'Publicación sobre la que se realizó el reporte. Parte de la llave primaria compuesta.';
-COMMENT ON COLUMN Reporte.estado           IS 'Estado actual del reporte: Pendiente, En Revisión, Atendido o Desestimado.';
-COMMENT ON COLUMN Reporte.fecha            IS 'Fecha en que se registró el reporte.';
-COMMENT ON COLUMN Reporte.motivo           IS 'Descripción detallada del motivo de la denuncia proporcionada por el usuario.';
-COMMENT ON COLUMN Reporte.id_administrador IS 'Administrador asignado para revisar y resolver el reporte. NULL hasta que sea asignado.';
-COMMENT ON CONSTRAINT chk_estado_reporte ON Reporte IS 'Solo se permiten los estados definidos en el dominio del negocio: Pendiente, En Revisión, Atendido, Desestimado.';
+COMMENT ON COLUMN Reporte.id_reporte              IS 'Identificador del reporte. Parte de la llave primaria compuesta.';
+COMMENT ON COLUMN Reporte.id_usuario              IS 'Usuario que realizó la denuncia. Parte de la llave primaria compuesta.';
+COMMENT ON COLUMN Reporte.id_publicacion          IS 'Publicación sobre la que se realizó el reporte. Parte de la llave primaria compuesta.';
+COMMENT ON COLUMN Reporte.id_usuario_publicacion  IS 'Dueño de la publicación denunciada. Forma la FK compuesta hacia Publicacion.';
+COMMENT ON COLUMN Reporte.estado                  IS 'Estado actual del reporte: Pendiente, En Revisión, Atendido o Desestimado.';
+COMMENT ON COLUMN Reporte.fecha                   IS 'Fecha en que se registró el reporte.';
+COMMENT ON COLUMN Reporte.motivo                  IS 'Descripción detallada del motivo de la denuncia proporcionada por el usuario.';
+COMMENT ON COLUMN Reporte.id_administrador        IS 'Administrador asignado para revisar y resolver el reporte. NULL hasta que sea asignado.';
+
+COMMENT ON CONSTRAINT chk_estado_reporte ON Reporte IS
+'Solo se permiten los estados definidos en el dominio del negocio: Pendiente, En Revisión, Atendido, Desestimado.';
 
 -- -------------------------------------------------------------
 -- Tabla: Formulario

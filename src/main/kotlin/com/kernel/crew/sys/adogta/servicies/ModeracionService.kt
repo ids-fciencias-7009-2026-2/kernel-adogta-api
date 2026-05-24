@@ -41,7 +41,6 @@ class ModeracionService(
      */
     @Transactional
     fun crearReporte(token: String, request: ReporteRequest): ReporteResponse {
-        logger.info("Creando reporte para publicación ${request.idPublicacion}")
 
         val usuario = usuarioService.getAsEntity(token)
             ?: throw IllegalArgumentException("Token inválido")
@@ -61,6 +60,7 @@ class ModeracionService(
         val reporte = ReporteEntity(
             idUsuario = usuario.id!!,
             idPublicacion = request.idPublicacion,
+            idUsuarioPublicacion = publicacion.idUsuario,
             motivo = request.motivo,
             estado = "Pendiente",
             fecha = LocalDate.now()
@@ -101,16 +101,17 @@ class ModeracionService(
     }
 
     /**
-     * Resuelve un reporte: desestimar o dar de baja la publicación.
+     * Resuelve un reporte: desestimar el reporte o dar de baja la publicación.
      *
-     * @param idReporte ID del reporte a resolver.
-     * @param request   Acción a tomar ("DESESTIMAR" o "BAJA_PUBLICACION").
-     * @throws IllegalArgumentException si el reporte o la publicación asociada no existen,
-     *         o si la acción no es válida.
+     * @param idReporte  ID del reporte a resolver.
+     * @param request    Acción a tomar ("DESESTIMAR" o "BAJA_PUBLICACION").
+     * @param tokenAdmin Token de sesión del administrador.
+     * @throws IllegalArgumentException si faltan argumntos
      */
     @Transactional
-    fun resolverReporte(idReporte: Long, request: ResolverReporteRequest) {
-        logger.info("Resolviendo reporte $idReporte con acción ${request.accion}")
+    fun resolverReporte(idReporte: Long, request: ResolverReporteRequest, tokenAdmin: String) {
+        val admin = administradorService.validarToken(tokenAdmin)
+            ?: throw IllegalArgumentException("Token de administrador inválido")
 
         val reporte = reporteRepository.findById(idReporte)
             .orElseThrow { IllegalArgumentException("Reporte no encontrado") }
@@ -129,8 +130,13 @@ class ModeracionService(
             }
             else -> throw IllegalArgumentException("Acción no válida")
         }
+
+        // Registrar quién resolvió el reporte
+        reporte.idAdministrador = admin.idAdministrador
+
         reporteRepository.save(reporte)
         publicacionRepository.save(publicacion)
+        logger.info("Reporte $idReporte resuelto por administrador ${admin.email}")
     }
 
     /**
@@ -170,7 +176,7 @@ class ModeracionService(
 
         // Ocultar sus publicaciones
         val publicaciones = publicacionRepository.findByIdUsuario(usuario.id!!.toInt())
-        publicaciones.forEach { it.estado = "Pausada" }
+        publicaciones.forEach { it.estado = "Suspndida" }
         publicacionRepository.saveAll(publicaciones)
 
         // Enviar correo de notificación

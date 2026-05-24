@@ -91,7 +91,7 @@ class ModeracionController(
         if (token == null) return ResponseEntity.status(401).build()
         if (administradorService.validarToken(token) == null) return ResponseEntity.status(403).build()
         return try {
-            moderacionService.resolverReporte(idReporte, request)
+            moderacionService.resolverReporte(idReporte, request, token)
             ResponseEntity.ok(mapOf("mensaje" to "Reporte resuelto"))
         } catch (e: Exception) {
             ResponseEntity.status(400).body(mapOf("error" to e.message))
