@@ -9,6 +9,14 @@ import com.fasterxml.jackson.annotation.JsonProperty
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class LlmMapResponse(
+    @JsonProperty("nombre")
+    @JsonAlias("name")
+    val nombre: String,
+
+    @JsonProperty("temperamento")
+    @JsonAlias("temperament")
+    val temperamento: String,
+
     @JsonProperty("nivel_energia")
     @JsonAlias("nivelEnergia")
     val nivelEnergia: Int,

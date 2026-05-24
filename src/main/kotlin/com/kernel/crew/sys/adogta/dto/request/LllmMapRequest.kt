@@ -7,10 +7,12 @@ package com.kernel.crew.sys.adogta.dto.request
  *
  * Ejemplo de body:
  * {
+ *   "nombre": "Pug",
  *   "texto_a_clasificar": "Affectionate, playful, friendly, charming, adaptable"
  * }
  */
 
 data class LlmMapRequest(
+    val nombre: String,
     val texto_a_clasificar: String
 )

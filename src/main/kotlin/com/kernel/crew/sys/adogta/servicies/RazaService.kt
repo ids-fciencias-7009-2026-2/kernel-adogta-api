@@ -71,9 +71,11 @@ class RazaService(
         val match = resultados.firstOrNull { normalizar(it.name) == normalizar(nombre) } ?: return null
 
         val temperament = match.temperament ?: ""
-        val llmResponse = mapearRasgosConLlm(LlmMapRequest(temperament))
+        val llmResponse = mapearRasgosConLlm(LlmMapRequest(nombre = match.name, texto_a_clasificar = temperament))
             ?: return null
 
+        val nombre = llmResponse.nombre ?: match.name
+        val personalidad = llmResponse.personalidad ?: ""
         val nivelEnergia = llmResponse.nivelEnergia.coerceIn(1, 5)
         val sociableNinos = llmResponse.sociableNiños.coerceIn(1, 5)
         val sociableMascotas = llmResponse.sociableMascotas.coerceIn(1, 5)
@@ -82,12 +84,12 @@ class RazaService(
         val hipoalergenico = if (TemperamentMapper.RAZAS_PERRO_HIPOALERGENICAS.contains(normalizar(match.name))) 1 else 0
 
         return RazaEntity(
-            nombre = match.name,
+            nombre = nombre,
             tipo = tipoBd,
             talla = talla,
             independencia = independencia,
             nivelEnergia = nivelEnergia,
-            personalidad = "",
+            personalidad = personalidad,
             sociableNiños = sociableNinos,
             sociableMascotas = sociableMascotas,
             esHipoalergenico = hipoalergenico
