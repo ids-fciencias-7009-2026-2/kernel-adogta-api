@@ -75,7 +75,7 @@ class RazaService(
             ?: return null
 
         val nombre = llmResponse.nombre ?: match.name
-        val personalidad = llmResponse.personalidad ?: ""
+        val personalidad = llmResponse.temperamento ?: ""
         val nivelEnergia = llmResponse.nivelEnergia.coerceIn(1, 5)
         val sociableNinos = llmResponse.sociableNiños.coerceIn(1, 5)
         val sociableMascotas = llmResponse.sociableMascotas.coerceIn(1, 5)

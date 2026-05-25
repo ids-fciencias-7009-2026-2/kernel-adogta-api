@@ -212,13 +212,46 @@ class SolicitudService(
         val usuarioActual = usuarioRepository.findByTokenSesion(token) ?: return false
         val solicitud = solicitudRepository.findByIdSolicitud(idSolicitud) ?: return false
         val publicacion = publicacionRepository.findByIdPublicacionAndIdUsuario(solicitud.idPublicacionAnimal, solicitud.idUsuarioAnimal) ?: return false
+        
         publicacion.estado = "En proceso"
         publicacionRepository.save(publicacion)
+
+        solicitud.estado = "Aprobada"
+        solicitudRepository.save(solicitud)
+
+        val interesados = solicitudRepository.findAllByIdPublicacionAnimal(solicitud.idPublicacionAnimal)
 
         /*
         * C4: enviar correos de solicitudes aprobadas, manejar logica.
         * */
 
+        val adoptanteSeleccionado = usuarioRepository.findById(solicitud.idUsuario.toLong()).orElse(null)
+        val animalPK = AnimalId(
+            idAnimal = solicitud.idAnimal,
+            idPublicacion = solicitud.idPublicacionAnimal,
+            idUsuario = solicitud.idUsuarioAnimal,
+        )
+        val nombreAnimal = animalRepository.findById(animalPK).orElse(null)?.nombre ?: "Tu mascota"
+
+        if (adoptanteSeleccionado != null) {
+            /* Envia correo  al seleccionado */
+            emailService.enviarCorreoSeleccionado(adoptanteSeleccionado.email, nombreAnimal)
+        }
+
+        /* Envia correo a los no seleccionados */
+        for (otraSolicitud in interesados) {
+            if (otraSolicitud.idSolicitud != idSolicitud) {
+                otraSolicitud.estado = "Rechazada"
+                solicitudRepository.save(otraSolicitud)
+                val otroAdoptante = usuarioRepository.findById(otraSolicitud.idUsuario.toLong()).orElse(null)
+                if (otroAdoptante != null) {
+                    emailService.enviarCorreoNoSeleccionado(
+                        otroAdoptante.email,
+                        nombreAnimal
+                    )
+                }
+            }
+        }
         return true
     }
 
