@@ -26,4 +26,5 @@ interface AnimalRepository : JpaRepository<AnimalEntity, AnimalId> {
      * @return Annimal(es) asociado.
      */
     fun findByIdPublicacion(idPublicacion: Int): List<AnimalEntity>
+
 }

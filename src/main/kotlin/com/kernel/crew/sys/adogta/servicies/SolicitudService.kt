@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import kotlin.Int
 
 @Service
 class SolicitudService(
@@ -124,4 +125,45 @@ class SolicitudService(
         val usuarioActual = usuarioRepository.findByTokenSesion(token) ?: return false
         return solicitudRepository.existsByUsuarioAndIdPublicacionAnimal(usuarioActual, idPublicacion)
     }
+
+    /**
+     * Metodo que controla la logica para recibir el token de sesion  y obtener una lista de solicitudes
+     * realizadas correspondientes a dicho a token. Las instancias <SolicitudResponse> son instancias que
+     * devuelven respuesta, dicha respuesta son las publicaciones en las que el usuario con el token actual
+     * que se maneja ha expresado su interes.
+     *
+     * @param token Token de sesion del usuario actual.
+     * @return Lista de solicitudes.
+     * */
+    open fun getAllSolicitudes(token: String): List<SolicitudResponse> {
+        val usuarioActual = usuarioRepository.findByTokenSesion(token)
+        val solicitudesUsuario = solicitudRepository.getByUsuario(usuarioActual)
+        val misSolicitudes = mutableListOf<SolicitudResponse>()
+
+        for (solicitud in solicitudesUsuario) {
+            val pk = AnimalId(
+                idAnimal = solicitud.idAnimal,
+                idPublicacion = solicitud.idPublicacionAnimal,
+                idUsuario = solicitud.idUsuarioAnimal
+            )
+            val animalAsociado = animalRepository.findById(pk).orElse(null)
+
+            val miSolicitud = SolicitudResponse(
+                idSolicitud = solicitud.idSolicitud,
+                idUsuario = solicitud.idUsuario,
+                idAnimal = animalAsociado.idAnimal,
+                idPublicacion= animalAsociado.idPublicacion,
+                idUsuarioAnimal = solicitud.idUsuarioAnimal,
+                estado = solicitud.estado,
+                fecha = solicitud.fecha,
+                nombreAnimal = animalAsociado.nombre,
+                fotoAnimal = animalAsociado.fotos as MutableSet<String?>,
+                estadoPublicacion = animalAsociado?.publicacion?.estado
+            )
+
+            misSolicitudes.add(miSolicitud)
+        }
+        return misSolicitudes
+    }
+
 }

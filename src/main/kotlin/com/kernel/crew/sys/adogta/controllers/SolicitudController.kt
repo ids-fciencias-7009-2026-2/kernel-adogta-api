@@ -34,6 +34,8 @@ class SolicitudController {
     @Autowired
     lateinit var solicitudService: SolicitudService
 
+
+
     /**
      * Registra el interés de un adoptante en un animal publicado.
      *
@@ -97,4 +99,35 @@ class SolicitudController {
             return ResponseEntity.status(400).body(mapOf("error" to e.message))
         }
     }
+
+    /**
+     *  Metodo que devuelve la lista de solictiudes realizadas por un usuario de tipo <SolictudResponse>
+     *  Verifica que haya un inicio de sesion, posteriormente  regresa todas las solicitudes hechas por
+     *  dicho usuario.
+     *
+     *  @param token Token de sesion del usuario actual.
+     *  @return una lista List<SolicitudResponse> si no hay ningun problema.
+     * */
+    @GetMapping("/mis-solicitudes")
+    open fun obtenerTodasSolicitudes(@RequestHeader("Authorization", required = false) token: String?): ResponseEntity<Any> {
+        if (token == null)
+            return ResponseEntity.status(401).build()
+        try {
+            val solicitudes = solicitudService.getAllSolicitudes(token)
+            return ResponseEntity.ok(solicitudes)
+        } catch (e: Exception) {
+            logger.warn("Solicitud invalida: ${e.message}")
+            return ResponseEntity.status(400).body(mapOf("error" to e.message))
+        }
+    }
+
+    /**
+    * Metodo que define el endpoint para manejar peticiones
+    * GET /api/solicitudes/mis-publicaciones Lo cual devuelve
+    * una lista de las publicaciones realizadas por el usuario con el token de sesion
+    * actual.
+    * @param token El tokem de sesion actual.
+    * */
+
+
 }

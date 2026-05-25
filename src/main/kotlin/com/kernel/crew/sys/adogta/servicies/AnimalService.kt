@@ -98,15 +98,19 @@ class AnimalService(
      * @return Lista de [AnimalResponse] con idAnimal, idPublicacion y nombre.
      */
     @Transactional(readOnly = true)
-    fun listarMisPublicaciones(token: String): List<AnimalResponse> {
+    fun listarMisPublicaciones(token: String): List<AnimalListItemResponse> {
         logger.info("listando publicaciones par token: $token")
         val usuario = usuarioService.getMe(token) ?: throw Exception("Token inválido")
         val publicaciones = publicacionRepository.findByIdUsuario(usuario.id.toInt())
-        return publicaciones.flatMap { pub ->
-            animalRepository.findByIdPublicacion(pub.idPublicacion).map { animal ->
-                AnimalResponse(idAnimal = animal.idAnimal, idPublicacion = pub.idPublicacion, nombre = animal.nombre)
+        val misPublicacionesResponse = mutableListOf<AnimalListItemResponse>()
+
+        for (publicacion in publicaciones) {
+            val animalesPublicados = animalRepository.findByIdPublicacion(publicacion.idPublicacion)
+            for (animalPublicado in animalesPublicados) {
+                misPublicacionesResponse.add(AnimalListItemResponse.from(animalPublicado))
             }
         }
+        return misPublicacionesResponse
     }
 
     /**

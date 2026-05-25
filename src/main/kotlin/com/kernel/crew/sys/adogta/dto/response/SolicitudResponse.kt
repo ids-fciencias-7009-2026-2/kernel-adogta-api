@@ -9,5 +9,8 @@ data class SolicitudResponse(
     val idPublicacion: Int,
     val idUsuarioAnimal: Int,
     val estado: String,
-    val fecha: LocalDate
+    val fecha: LocalDate,
+    val nombreAnimal: String? = null,
+    val fotoAnimal: MutableSet<String?> = mutableSetOf(),
+    val estadoPublicacion: String? = null
 )
