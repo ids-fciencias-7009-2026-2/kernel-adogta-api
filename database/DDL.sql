@@ -80,29 +80,27 @@ COMMENT ON CONSTRAINT chk_googleid_fmt   ON Usuario IS 'El google_id debe ser nu
 -- Tabla: Administrador
 -- -------------------------------------------------------------
 CREATE TABLE Administrador (
-    id_administrador SERIAL PRIMARY KEY,
-    email            VARCHAR(150) NOT NULL,
-    contrasena       VARCHAR(255) NOT NULL,
-    nombres          VARCHAR(100) NOT NULL,
-    apellido_paterno VARCHAR(100) NOT NULL,
-    apellido_materno VARCHAR(100) NULL,
-
-    CONSTRAINT chk_admin_email CHECK (email ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$'),
-    CONSTRAINT chk_admin_pass  CHECK (length(contrasena) >= 8)
+    id_administrador            SERIAL PRIMARY KEY,
+    email                       VARCHAR(150) NOT NULL,
+    contrasena                  VARCHAR(255) NOT NULL,
+    nombres                     VARCHAR(100) NOT NULL,
+    apellido_paterno            VARCHAR(100) NOT NULL,
+    apellido_materno            VARCHAR(100) NULL,
+    token_sesion                VARCHAR(255) NULL,
+    fecha_expiracion_sesion     TIMESTAMP NULL
 );
 
-COMMENT ON TABLE Administrador IS 'Usuario con privilegios de moderación. Tiene acceso a funcionalidades restringidas como revisión de reportes y baneo de usuarios.';
+COMMENT ON TABLE Administrador IS
+'Usuario con privilegios de moderación. Tiene acceso a funcionalidades restringidas como revisión de reportes y baneo de usuarios.';
 
-COMMENT ON COLUMN Administrador.id_administrador IS 'Identificador único del administrador. Generado automáticamente por la base de datos.';
-COMMENT ON COLUMN Administrador.email            IS 'Correo electrónico del administrador. Usado como credencial de acceso.';
-COMMENT ON COLUMN Administrador.contrasena       IS 'Contraseña del administrador. Mínimo 8 caracteres.';
-COMMENT ON COLUMN Administrador.nombres          IS 'Nombre(s) del administrador.';
-COMMENT ON COLUMN Administrador.apellido_paterno IS 'Primer apellido del administrador.';
-COMMENT ON COLUMN Administrador.apellido_materno IS 'Segundo apellido del administrador. Opcional.';
-
-COMMENT ON CONSTRAINT chk_admin_email ON Administrador IS 'El email debe tener formato válido según expresión regular.';
-COMMENT ON CONSTRAINT chk_admin_pass  ON Administrador IS 'La contraseña debe tener al menos 8 caracteres.';
-
+COMMENT ON COLUMN Administrador.id_administrador          IS 'Identificador único del administrador. Generado automáticamente.';
+COMMENT ON COLUMN Administrador.email                      IS 'Correo electrónico del administrador. Usado como credencial de acceso.';
+COMMENT ON COLUMN Administrador.contrasena                IS 'Contraseña del administrador. Mínimo 8 caracteres.';
+COMMENT ON COLUMN Administrador.nombres                   IS 'Nombre(s) del administrador.';
+COMMENT ON COLUMN Administrador.apellido_paterno          IS 'Primer apellido del administrador.';
+COMMENT ON COLUMN Administrador.apellido_materno          IS 'Segundo apellido del administrador. Opcional.';
+COMMENT ON COLUMN Administrador.token_sesion              IS 'Token de sesión activo generado al autenticarse. NULL cuando no hay sesión activa.';
+COMMENT ON COLUMN Administrador.fecha_expiracion_sesion   IS 'Fecha y hora de expiración del token de sesión activo.';
 
 -- -------------------------------------------------------------
 -- Tabla: Raza
@@ -160,16 +158,16 @@ CREATE TABLE Publicacion (
     PRIMARY KEY (id_publicacion, id_usuario),
     FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario),
 
-    CONSTRAINT chk_estado_publicacion CHECK (estado IN ('Activa', 'Pausada', 'Cerrada', 'Borrada'))
+    CONSTRAINT chk_estado_publicacion CHECK (estado IN ('Activa', 'Pausada', 'Cerrada', 'Borrada', 'En revision', 'Suspendida'))
 );
 
 COMMENT ON TABLE Publicacion IS 'Representa una oferta de adopción creada por un donante. Contiene el estado del proceso y está vinculada a un animal.';
 
 COMMENT ON COLUMN Publicacion.id_publicacion IS 'Identificador de la publicación. Parte de la llave primaria compuesta.';
 COMMENT ON COLUMN Publicacion.id_usuario     IS 'Usuario donante que creó la publicación. Parte de la llave primaria compuesta.';
-COMMENT ON COLUMN Publicacion.estado         IS 'Estado actual de la publicación: Activa, Pausada, Cerrada o Borrada.';
+COMMENT ON COLUMN Publicacion.estado         IS 'Estado actual de la publicación: Activa, Pausada, Cerrada, Borrada, En revision o Suspendidas.';
 
-COMMENT ON CONSTRAINT chk_estado_publicacion ON Publicacion IS 'Solo se permiten los estados definidos en el dominio del negocio: Activa, Pausada, Cerrada, Borrada.';
+COMMENT ON CONSTRAINT chk_estado_publicacion ON Publicacion IS 'Solo se permiten los estados definidos en el dominio del negocio: Activa, Pausada, Cerrada, Borrada, En revision, Suspendida';
 
 
 -- -------------------------------------------------------------
@@ -375,40 +373,47 @@ COMMENT ON CONSTRAINT chk_donante_consistente ON Contrato IS 'El donante del con
 -- Tabla: Reporte
 -- -------------------------------------------------------------
 CREATE TABLE Reporte (
-    id_reporte       SERIAL,
-    id_usuario       INT,
-    id_publicacion   INT,
-    estado           VARCHAR(50),
-    fecha            DATE,
-    motivo           TEXT,
-    id_administrador INT,
+    id_reporte              SERIAL,
+    id_usuario              INT,                  
+    id_publicacion          INT,                  
+    id_usuario_publicacion  INT,                 
+    estado                  VARCHAR(50),
+    fecha                   DATE,
+    motivo                  TEXT,
+    id_administrador        INT,
 
     PRIMARY KEY (id_reporte, id_usuario, id_publicacion),
-    FOREIGN KEY (id_publicacion, id_usuario) REFERENCES Publicacion(id_publicacion, id_usuario),
-    FOREIGN KEY (id_administrador) REFERENCES Administrador(id_administrador),
+    FOREIGN KEY (id_usuario)                          REFERENCES Usuario(id_usuario),
+    FOREIGN KEY (id_publicacion, id_usuario_publicacion) REFERENCES Publicacion(id_publicacion, id_usuario),
+    FOREIGN KEY (id_administrador)                    REFERENCES Administrador(id_administrador),
 
-    CONSTRAINT chk_estado_reporte CHECK (estado IN ('Pendiente', 'En Revisión', 'Atendido', 'Desestimado'))
+    CONSTRAINT chk_estado_reporte CHECK (
+        estado IN ('Pendiente', 'En Revisión', 'Atendido', 'Desestimado')
+    )
 );
 
-COMMENT ON TABLE Reporte IS 'Registro de denuncias realizadas por usuarios sobre una publicación. Un administrador revisa y gestiona cada reporte.';
+COMMENT ON TABLE Reporte IS
+'Registro de denuncias realizadas por usuarios sobre una publicación. '
+'Un administrador revisa y gestiona cada reporte.';
 
-COMMENT ON COLUMN Reporte.id_reporte       IS 'Identificador del reporte. Parte de la llave primaria compuesta.';
-COMMENT ON COLUMN Reporte.id_usuario       IS 'Usuario que realizó la denuncia. Parte de la llave primaria compuesta.';
-COMMENT ON COLUMN Reporte.id_publicacion   IS 'Publicación sobre la que se realizó el reporte. Parte de la llave primaria compuesta.';
-COMMENT ON COLUMN Reporte.estado           IS 'Estado actual del reporte: Pendiente, En Revisión, Atendido o Desestimado.';
-COMMENT ON COLUMN Reporte.fecha            IS 'Fecha en que se registró el reporte.';
-COMMENT ON COLUMN Reporte.motivo           IS 'Descripción detallada del motivo de la denuncia proporcionada por el usuario.';
-COMMENT ON COLUMN Reporte.id_administrador IS 'Administrador asignado para revisar y resolver el reporte. NULL hasta que sea asignado.';
+COMMENT ON COLUMN Reporte.id_reporte              IS 'Identificador del reporte. Parte de la llave primaria compuesta.';
+COMMENT ON COLUMN Reporte.id_usuario              IS 'Usuario que realizó la denuncia. Parte de la llave primaria compuesta.';
+COMMENT ON COLUMN Reporte.id_publicacion          IS 'Publicación sobre la que se realizó el reporte. Parte de la llave primaria compuesta.';
+COMMENT ON COLUMN Reporte.id_usuario_publicacion  IS 'Dueño de la publicación denunciada. Forma la FK compuesta hacia Publicacion.';
+COMMENT ON COLUMN Reporte.estado                  IS 'Estado actual del reporte: Pendiente, En Revisión, Atendido o Desestimado.';
+COMMENT ON COLUMN Reporte.fecha                   IS 'Fecha en que se registró el reporte.';
+COMMENT ON COLUMN Reporte.motivo                  IS 'Descripción detallada del motivo de la denuncia proporcionada por el usuario.';
+COMMENT ON COLUMN Reporte.id_administrador        IS 'Administrador asignado para revisar y resolver el reporte. NULL hasta que sea asignado.';
 
-COMMENT ON CONSTRAINT chk_estado_reporte ON Reporte IS 'Solo se permiten los estados definidos en el dominio del negocio: Pendiente, En Revisión, Atendido, Desestimado.';
-
+COMMENT ON CONSTRAINT chk_estado_reporte ON Reporte IS
+'Solo se permiten los estados definidos en el dominio del negocio: Pendiente, En Revisión, Atendido, Desestimado.';
 
 -- -------------------------------------------------------------
 -- Tabla: Formulario
 -- -------------------------------------------------------------
 CREATE TABLE Formulario (
     id_formulario SERIAL PRIMARY KEY,
-    id_usuario    INT UNIQUE NOT NULL,
+    id_usuario    INT NOT NULL,
     presupuesto INT NOT NULL,
     tiene_alergias INT NOT NULL,
     fecha_envio DATE NOT NULL,
