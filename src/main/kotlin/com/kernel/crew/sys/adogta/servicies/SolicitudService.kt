@@ -1,10 +1,12 @@
 package com.kernel.crew.sys.adogta.servicies
 
 import com.kernel.crew.sys.adogta.dto.request.SolicitudRequest
+import com.kernel.crew.sys.adogta.dto.response.InteresadoResponse
 import com.kernel.crew.sys.adogta.dto.response.SolicitudResponse
 import com.kernel.crew.sys.adogta.entities.AnimalId
 import com.kernel.crew.sys.adogta.entities.SolicitudEntity
 import com.kernel.crew.sys.adogta.repositories.AnimalRepository
+import com.kernel.crew.sys.adogta.repositories.PublicacionRepository
 import com.kernel.crew.sys.adogta.repositories.SolicitudRepository
 import com.kernel.crew.sys.adogta.repositories.UsuarioRepository
 import org.slf4j.LoggerFactory
@@ -20,7 +22,8 @@ class SolicitudService(
     private val animalRepository: AnimalRepository,
     private val usuarioRepository: UsuarioRepository,
     private val usuarioService: UsuarioService,
-    private val emailService: EmailService
+    private val emailService: EmailService,
+    private val publicacionRepository: PublicacionRepository
 ) {
     private val logger = LoggerFactory.getLogger(SolicitudService::class.java)
 
@@ -164,6 +167,59 @@ class SolicitudService(
             misSolicitudes.add(miSolicitud)
         }
         return misSolicitudes
+    }
+
+    /**
+     * Metodo que maneja toda lo logica y proceso de obtener una lista de personas
+     * interesadas en una publicacion dado el token del usuario actual con el id de una
+     * publicacion especifica. Maneja la conversion de Entity-Response para consumo
+     * de API y acceso a endopoints.
+     * La implementacion es iterativa realizando solo dicha conversion.
+     *
+     * @param token Token de sesion del usuario con la publicacion.
+     * @param idPublicacion Id de la publicacion del usuario actual.
+     * @return misInteresadosPub Lista de interesados en la publicacion.
+     * */
+    open fun getAllInteresados(token: String, idPublicacion: Int): List<InteresadoResponse> {
+        val usuarioActual = usuarioRepository.findByTokenSesion(token) ?: return emptyList()
+        val interesados = solicitudRepository.findAllByIdPublicacionAnimal(idPublicacion)
+        val misInteresadosPub = mutableListOf<InteresadoResponse>()
+
+        for (interesadoSol in interesados) {
+            val adoptante = usuarioRepository.findById(interesadoSol.idUsuario.toLong()).orElse(null)
+            val miInteresadoPub = InteresadoResponse(
+                idSolicitud = interesadoSol.idSolicitud,
+                idUsuario = interesadoSol.idUsuario,
+                nombre = "${adoptante?.nombres} ${adoptante?.apellidoPaterno}",
+                email = adoptante?.email ?: "",
+                telefono = adoptante.telefono
+            )
+            misInteresadosPub.add(miInteresadoPub)
+        }
+        return misInteresadosPub
+    }
+
+    /**
+     * Metodo que maneja toda la logica y proceso de inicio de tramite en el proceso de
+     * adopcion. El usuario actual inicia el tramite con una solicitud la cual consiste
+     * en establecer contacto con la persona seleccionada para iniciar el proceso de adopcion
+     *
+     * @param token Token de sesion del usuario actual.
+     * @param idSolicitud Id de la solicitud para tramite.
+     * @return verdadero o falso en el proceso.
+     * */
+    open fun inicioTramite(token: String, idSolicitud: Int): Boolean {
+        val usuarioActual = usuarioRepository.findByTokenSesion(token) ?: return false
+        val solicitud = solicitudRepository.findByIdSolicitud(idSolicitud) ?: return false
+        val publicacion = publicacionRepository.findByIdPublicacionAndIdUsuario(solicitud.idPublicacionAnimal, solicitud.idUsuarioAnimal) ?: return false
+        publicacion.estado = "En proceso"
+        publicacionRepository.save(publicacion)
+
+        /*
+        * C4: enviar correos de solicitudes aprobadas, manejar logica.
+        * */
+
+        return true
     }
 
 }

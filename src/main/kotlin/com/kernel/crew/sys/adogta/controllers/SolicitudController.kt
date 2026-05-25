@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PutMapping
 
 /**
  * Controlador REST que expone los endpoints relacionados con la entidad Solicitud.
@@ -122,12 +123,55 @@ class SolicitudController {
     }
 
     /**
-    * Metodo que define el endpoint para manejar peticiones
-    * GET /api/solicitudes/mis-publicaciones Lo cual devuelve
-    * una lista de las publicaciones realizadas por el usuario con el token de sesion
-    * actual.
-    * @param token El tokem de sesion actual.
-    * */
+     * Metodo que regresa una lista de todos los interesados en una publicacion. El endopoint
+     * GET /por-publicacion/{idPublicaicon} recibe el id correspondiente a una publiacion y regresa
+     * la lista de todos los solicitantes.
+     *
+     * @param idPublicacion Id de la publicacion.
+     * @param token El token de sesion del usuario actual que consuma la API.
+     * @return La lista de todos los usuarios solicitantes interesados.
+     * */
 
+    @GetMapping("/por-publicacion/{idPublicacion}")
+    open fun obtenerInteresados(
+        @RequestHeader("Authorization", required = false) token: String?,
+        @PathVariable idPublicacion: Int): ResponseEntity<Any> {
+        if (token == null)
+            return ResponseEntity.status(401).build()
+        try {
+            val interesados = solicitudService.getAllInteresados(token, idPublicacion)
+            return ResponseEntity.ok(interesados)
+        } catch (e: Exception){
+            logger.warn("Solicitud obtener interesados ex: $e")
+            return ResponseEntity.status(400).body(mapOf("error" to e.message))
+        }
+    }
+
+    /**
+     * Metodo que dado el id de la solicitud recibida, modifica la solicitud
+     * para dar el siguiente paso, "En proceso" que establece una comunicacion via
+     * correo con el usuario adoptante.
+     *
+     * @param idSolicitud Id de la solicitud de interes.
+     * @param token Token de sesion actual para el usuario que consuma la API.
+     * @return Mensaje de exito o fracaso si se proceso correctamente.
+     * */
+
+    @PutMapping("/{idSolicitud}/iniciar-tramite")
+    open fun iniciarTramite(
+        @RequestHeader("Authorization", required = false) token: String?,
+        @PathVariable idSolicitud: Int): ResponseEntity<Any> {
+        if (token == null)
+            return ResponseEntity.status(401).build()
+        try {
+            val tramiteIniciado = solicitudService.inicioTramite(token, idSolicitud)
+            if (tramiteIniciado)
+                return ResponseEntity.ok(mapOf("iniciado" to tramiteIniciado))
+            return ResponseEntity.status(400).body(mapOf("error" to "No se completo el tramite"))
+        }catch (e: Exception){
+            logger.warn("Solicitud inicar tramite ex: $e ")
+            return ResponseEntity.status(400).body(mapOf("error" to e.message))
+        }
+    }
 
 }

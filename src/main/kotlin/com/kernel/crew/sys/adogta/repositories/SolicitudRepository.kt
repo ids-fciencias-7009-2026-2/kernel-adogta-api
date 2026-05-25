@@ -24,4 +24,9 @@ interface SolicitudRepository : JpaRepository<SolicitudEntity, SolicitudId> {
     ): Boolean
 
     fun getByUsuario(usuario: UsuarioEntity?): List<SolicitudEntity>
+
+    fun findByIdSolicitud(idSolicitud: Int): SolicitudEntity?
+
+    fun findAllByIdPublicacionAnimal(idPublicacion: Int): List<SolicitudEntity>
+
 }
