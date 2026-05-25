@@ -127,6 +127,21 @@ class AnimalService(
     }
 
     /**
+     * Obtiene el detalle público de un animal por su ID.
+     * Las publicaciones con estado "Borrada" se tratan como inexistentes.
+     *
+     * @param idAnimal ID del animal a consultar.
+     * @return [AnimalListItemResponse] del animal, o null si no existe o fue borrado.
+     */
+    @Transactional(readOnly = true)
+    fun obtenerDetalleAnimal(idAnimal: Int): AnimalListItemResponse? {
+        logger.info("Obteniendo detalle de animal: idAnimal=$idAnimal")
+        val animal = animalRepository.findByIdAnimal(idAnimal) ?: return null
+        if (animal.publicacion.estado == "Borrada") return null
+        return AnimalListItemResponse.from(animal)
+    }
+
+    /**
      * Obtiene los datos editables de un animal.
      * Solo el dueño de la publicación puede acceder.
      * @param token Token de sesión del usuario.

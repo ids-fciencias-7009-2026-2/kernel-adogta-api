@@ -3,16 +3,17 @@ package com.kernel.crew.sys.adogta.dto.response
 import com.kernel.crew.sys.adogta.entities.RazaEntity
 
 data class RazaResponse(
-    val idRaza: Int,
-    val nombre: String,
-    val tipo: String,
-    val talla: Int,
-    val independencia: Int,
-    val nivelEnergia: Int,
-    val personalidad: String,
-    val sociableNiños: Int,
-    val sociableMascotas: Int,
-    val esHipoalergenico: Int
+    val idRaza: Int? = null,
+    val nombre: String? = null,
+    val tipo: String? = null,
+    val talla: Int? = null,
+    val independencia: Int? = null,
+    val nivelEnergia: Int? = null,
+    val personalidad: String? = null,
+    val sociableNiños: Int? = null,
+    val sociableMascotas: Int? = null,
+    val esHipoalergenico: Int? = null,
+    val mensaje: String? = null
 ) {
     companion object {
         fun from(raza: RazaEntity): RazaResponse = RazaResponse(
@@ -26,6 +27,10 @@ data class RazaResponse(
             sociableNiños = raza.sociableNiños,
             sociableMascotas = raza.sociableMascotas,
             esHipoalergenico = raza.esHipoalergenico
+        )
+
+        fun error(mensaje: String): RazaResponse = RazaResponse(
+            mensaje = mensaje
         )
     }
 }

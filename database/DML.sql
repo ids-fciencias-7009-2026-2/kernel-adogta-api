@@ -55,7 +55,8 @@ INSERT INTO Usuario (
 -- Razas de prueba (10 perros, 10 gatos)
 -- -------------------------------------------------------------
 INSERT INTO Raza (nombre, tipo, talla, independencia, nivel_energia, personalidad, sociable_niños, sociable_mascotas, es_hipoalergenico) VALUES
-('Chihuahua',          'Perro', 1, 4, 4, 'Vivaz, alerta, valiente',                   2, 2, 0),
+('Sin Raza Especifica',          'Perro', 3, 3, 3, '',                                 3, 3, 0),
+('Chihuahua',          'Perro', 1, 4, 4, 'Vivaz, alerta, valiente',                    2, 2, 0),
 ('Pastor Alemán',      'Perro', 5, 3, 5, 'Inteligente, protector y trabajador',        4, 3, 0),
 ('Poodle',             'Perro', 3, 3, 4, 'Listo, elegante, hipoalergénico',            5, 4, 1),
 ('Beagle',             'Perro', 2, 3, 4, 'Curioso y sociable',                         5, 5, 0),
@@ -65,6 +66,7 @@ INSERT INTO Raza (nombre, tipo, talla, independencia, nivel_energia, personalida
 ('Bulldog Francés',    'Perro', 2, 4, 3, 'Gentil, afectuoso y tranquilo',              4, 3, 0),
 ('Border Collie',      'Perro', 4, 3, 5, 'Leal, obediente y activo',                   4, 4, 0),
 ('Bichón Frisé',       'Perro', 3, 3, 3, 'Juguetón, sociable y cariñoso',              5, 5, 1),
+('Sin Raza Especifica',          'Gato', 3, 3, 3, '',                                 3, 3, 0),
 ('Persa',              'Gato',  2, 4, 2, 'Tranquilo, cariñoso, de bajo mantenimiento', 3, 3, 0),
 ('Siamés',             'Gato',  2, 3, 4, 'Vocal, curioso, muy social',                 4, 3, 0),
 ('Maine Coon',         'Gato',  4, 3, 3, 'Gentil gigante, amistoso',                   5, 4, 0),
