@@ -38,6 +38,9 @@ interface EmailService {
         emailAdoptante: String,
         telefonoAdoptante: String?
     )
+    fun enviarCorreoSeleccionado(destinatario: String, nombreAnimal: String)
+
+    fun enviarCorreoNoSeleccionado(destinatario: String, nombreAnimal: String)
 
     /**
      * Corrreo de notificación de usuario baneado

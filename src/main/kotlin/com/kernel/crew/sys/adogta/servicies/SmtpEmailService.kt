@@ -106,6 +106,32 @@ class SmtpEmailService(
         logger.info("Correo de solicitud de adopción enviado a $destinatario (animal: $nombreAnimal)")
     }
 
+    override fun enviarCorreoSeleccionado(destinatario: String, nombreAnimal: String) {
+        val context = Context().apply {
+            setVariable("nombreAnimal", nombreAnimal)
+        }
+        val contenidoHtml = templateEngine.process("email-tramite-iniciado-seleccionado", context)
+        val mensaje: MimeMessage = mailSender.createMimeMessage()
+        val helper = MimeMessageHelper(mensaje, true, "UTF-8")
+        helper.setTo(destinatario)
+        helper.setSubject("¡Fuiste seleccionado para adoptar a $nombreAnimal! - Adogta")
+        helper.setText(contenidoHtml, true)
+        mailSender.send(mensaje)
+        logger.info("Correo tramite seleccionado enviado a $destinatario")
+    }
+
+    override fun enviarCorreoNoSeleccionado(destinatario: String, nombreAnimal: String) {
+        val context = Context().apply {
+            setVariable("nombreAnimal", nombreAnimal)
+        }
+        val contenidoHtml = templateEngine.process("email-tramite-iniciado-no-seleccionado", context)
+        val mensaje: MimeMessage = mailSender.createMimeMessage()
+        val helper = MimeMessageHelper(mensaje, true, "UTF-8")
+        helper.setTo(destinatario)
+        helper.setSubject("Actualización sobre $nombreAnimal - Adogta")
+        helper.setText(contenidoHtml, true)
+        mailSender.send(mensaje)
+        logger.info("Correo tramite no seleccionado enviado a $destinatario")
     
     override fun enviarNotificacionBaneo(destinatario: String, motivo: String) {
         val context = Context().apply {

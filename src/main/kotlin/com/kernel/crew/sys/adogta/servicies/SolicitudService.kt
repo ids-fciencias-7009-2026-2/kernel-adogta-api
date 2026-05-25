@@ -1,16 +1,20 @@
 package com.kernel.crew.sys.adogta.servicies
 
 import com.kernel.crew.sys.adogta.dto.request.SolicitudRequest
+import com.kernel.crew.sys.adogta.dto.response.InteresadoResponse
 import com.kernel.crew.sys.adogta.dto.response.SolicitudResponse
 import com.kernel.crew.sys.adogta.entities.AnimalId
 import com.kernel.crew.sys.adogta.entities.SolicitudEntity
 import com.kernel.crew.sys.adogta.repositories.AnimalRepository
+import com.kernel.crew.sys.adogta.repositories.PublicacionRepository
 import com.kernel.crew.sys.adogta.repositories.SolicitudRepository
 import com.kernel.crew.sys.adogta.repositories.UsuarioRepository
 import org.slf4j.LoggerFactory
+import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import kotlin.Int
 
 @Service
 class SolicitudService(
@@ -18,7 +22,8 @@ class SolicitudService(
     private val animalRepository: AnimalRepository,
     private val usuarioRepository: UsuarioRepository,
     private val usuarioService: UsuarioService,
-    private val emailService: EmailService
+    private val emailService: EmailService,
+    private val publicacionRepository: PublicacionRepository
 ) {
     private val logger = LoggerFactory.getLogger(SolicitudService::class.java)
 
@@ -110,4 +115,144 @@ class SolicitudService(
             fecha = guardada.fecha
         )
     }
+
+    /**
+     * Metodo que verifica el interes de una publiacion de algun animal, la implementacion es
+     * booleana por lo que no requiere verifiaciones de existencia.
+     *
+     * @param token Token de sesion del usuario actual.
+     * @param idPublicacion Identificador de la publiacion de la que sea desea verificar el interes.
+     * @return [VerdaderoFalso] si la publiacion con el id esta marcada con interes.
+     * */
+    open fun verificaInteres (token: String, idPublicacion:Int): Boolean {
+        val usuarioActual = usuarioRepository.findByTokenSesion(token) ?: return false
+        return solicitudRepository.existsByUsuarioAndIdPublicacionAnimal(usuarioActual, idPublicacion)
+    }
+
+    /**
+     * Metodo que controla la logica para recibir el token de sesion  y obtener una lista de solicitudes
+     * realizadas correspondientes a dicho a token. Las instancias <SolicitudResponse> son instancias que
+     * devuelven respuesta, dicha respuesta son las publicaciones en las que el usuario con el token actual
+     * que se maneja ha expresado su interes.
+     *
+     * @param token Token de sesion del usuario actual.
+     * @return Lista de solicitudes.
+     * */
+    open fun getAllSolicitudes(token: String): List<SolicitudResponse> {
+        val usuarioActual = usuarioRepository.findByTokenSesion(token)
+        val solicitudesUsuario = solicitudRepository.getByUsuario(usuarioActual)
+        val misSolicitudes = mutableListOf<SolicitudResponse>()
+
+        for (solicitud in solicitudesUsuario) {
+            val pk = AnimalId(
+                idAnimal = solicitud.idAnimal,
+                idPublicacion = solicitud.idPublicacionAnimal,
+                idUsuario = solicitud.idUsuarioAnimal
+            )
+            val animalAsociado = animalRepository.findById(pk).orElse(null)
+
+            val miSolicitud = SolicitudResponse(
+                idSolicitud = solicitud.idSolicitud,
+                idUsuario = solicitud.idUsuario,
+                idAnimal = animalAsociado.idAnimal,
+                idPublicacion= animalAsociado.idPublicacion,
+                idUsuarioAnimal = solicitud.idUsuarioAnimal,
+                estado = solicitud.estado,
+                fecha = solicitud.fecha,
+                nombreAnimal = animalAsociado.nombre,
+                fotoAnimal = animalAsociado.fotos as MutableSet<String?>,
+                estadoPublicacion = animalAsociado?.publicacion?.estado
+            )
+
+            misSolicitudes.add(miSolicitud)
+        }
+        return misSolicitudes
+    }
+
+    /**
+     * Metodo que maneja toda lo logica y proceso de obtener una lista de personas
+     * interesadas en una publicacion dado el token del usuario actual con el id de una
+     * publicacion especifica. Maneja la conversion de Entity-Response para consumo
+     * de API y acceso a endopoints.
+     * La implementacion es iterativa realizando solo dicha conversion.
+     *
+     * @param token Token de sesion del usuario con la publicacion.
+     * @param idPublicacion Id de la publicacion del usuario actual.
+     * @return misInteresadosPub Lista de interesados en la publicacion.
+     * */
+    open fun getAllInteresados(token: String, idPublicacion: Int): List<InteresadoResponse> {
+        val usuarioActual = usuarioRepository.findByTokenSesion(token) ?: return emptyList()
+        val interesados = solicitudRepository.findAllByIdPublicacionAnimal(idPublicacion)
+        val misInteresadosPub = mutableListOf<InteresadoResponse>()
+
+        for (interesadoSol in interesados) {
+            val adoptante = usuarioRepository.findById(interesadoSol.idUsuario.toLong()).orElse(null)
+            val miInteresadoPub = InteresadoResponse(
+                idSolicitud = interesadoSol.idSolicitud,
+                idUsuario = interesadoSol.idUsuario,
+                nombre = "${adoptante?.nombres} ${adoptante?.apellidoPaterno}",
+                email = adoptante?.email ?: "",
+                telefono = adoptante.telefono
+            )
+            misInteresadosPub.add(miInteresadoPub)
+        }
+        return misInteresadosPub
+    }
+
+    /**
+     * Metodo que maneja toda la logica y proceso de inicio de tramite en el proceso de
+     * adopcion. El usuario actual inicia el tramite con una solicitud la cual consiste
+     * en establecer contacto con la persona seleccionada para iniciar el proceso de adopcion
+     *
+     * @param token Token de sesion del usuario actual.
+     * @param idSolicitud Id de la solicitud para tramite.
+     * @return verdadero o falso en el proceso.
+     * */
+    open fun inicioTramite(token: String, idSolicitud: Int): Boolean {
+        val usuarioActual = usuarioRepository.findByTokenSesion(token) ?: return false
+        val solicitud = solicitudRepository.findByIdSolicitud(idSolicitud) ?: return false
+        val publicacion = publicacionRepository.findByIdPublicacionAndIdUsuario(solicitud.idPublicacionAnimal, solicitud.idUsuarioAnimal) ?: return false
+        
+        publicacion.estado = "En proceso"
+        publicacionRepository.save(publicacion)
+
+        solicitud.estado = "Aprobada"
+        solicitudRepository.save(solicitud)
+
+        val interesados = solicitudRepository.findAllByIdPublicacionAnimal(solicitud.idPublicacionAnimal)
+
+        /*
+        * C4: enviar correos de solicitudes aprobadas, manejar logica.
+        * */
+
+        val adoptanteSeleccionado = usuarioRepository.findById(solicitud.idUsuario.toLong()).orElse(null)
+        val animalPK = AnimalId(
+            idAnimal = solicitud.idAnimal,
+            idPublicacion = solicitud.idPublicacionAnimal,
+            idUsuario = solicitud.idUsuarioAnimal,
+        )
+        val nombreAnimal = animalRepository.findById(animalPK).orElse(null)?.nombre ?: "Tu mascota"
+
+        if (adoptanteSeleccionado != null) {
+            /* Envia correo  al seleccionado */
+            emailService.enviarCorreoSeleccionado(adoptanteSeleccionado.email, nombreAnimal)
+        }
+
+        /* Envia correo a los no seleccionados */
+        for (otraSolicitud in interesados) {
+            if (otraSolicitud.idSolicitud != idSolicitud) {
+                otraSolicitud.estado = "Rechazada"
+                solicitudRepository.save(otraSolicitud)
+                val otroAdoptante = usuarioRepository.findById(otraSolicitud.idUsuario.toLong()).orElse(null)
+                if (otroAdoptante != null) {
+                    emailService.enviarCorreoNoSeleccionado(
+                        otroAdoptante.email,
+                        nombreAnimal
+                    )
+                }
+            }
+        }
+        return true
+    }
+
 }

@@ -14,6 +14,8 @@ import com.kernel.crew.sys.adogta.dto.response.AnimalDetailResponse
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import com.kernel.crew.sys.adogta.repositories.FormularioRepository
+import com.kernel.crew.sys.adogta.servicies.UsuarioService
 
 @Service
 class AnimalService(
@@ -21,7 +23,8 @@ class AnimalService(
     private val publicacionRepository: PublicacionRepository,
     private val razaRepository: RazaRepository,
     private val usuarioRepository: UsuarioRepository,
-    private val usuarioService: UsuarioService
+    private val usuarioService: UsuarioService,
+    private val formularioRepository: FormularioRepository
 ) {
     private val logger = LoggerFactory.getLogger(AnimalService::class.java)
 
@@ -98,15 +101,19 @@ class AnimalService(
      * @return Lista de [AnimalResponse] con idAnimal, idPublicacion y nombre.
      */
     @Transactional(readOnly = true)
-    fun listarMisPublicaciones(token: String): List<AnimalResponse> {
+    fun listarMisPublicaciones(token: String): List<AnimalListItemResponse> {
         logger.info("listando publicaciones par token: $token")
         val usuario = usuarioService.getMe(token) ?: throw Exception("Token inválido")
         val publicaciones = publicacionRepository.findByIdUsuario(usuario.id.toInt())
-        return publicaciones.flatMap { pub ->
-            animalRepository.findByIdPublicacion(pub.idPublicacion).map { animal ->
-                AnimalResponse(idAnimal = animal.idAnimal, idPublicacion = pub.idPublicacion, nombre = animal.nombre)
+        val misPublicacionesResponse = mutableListOf<AnimalListItemResponse>()
+
+        for (publicacion in publicaciones) {
+            val animalesPublicados = animalRepository.findByIdPublicacion(publicacion.idPublicacion)
+            for (animalPublicado in animalesPublicados) {
+                misPublicacionesResponse.add(AnimalListItemResponse.from(animalPublicado))
             }
         }
+        return misPublicacionesResponse
     }
 
     /**
@@ -227,5 +234,112 @@ class AnimalService(
             ?: throw Exception("Publicación no encontrada o no eres el dueño")
         publicacion.estado = nuevoEstado
         publicacionRepository.save(publicacion)
+    }
+
+
+    /**
+     * Recomienda animales en adopción compatibles con el perfil del usuario autenticado.
+     *
+     * Aplica un algoritmo de dos capas:
+     *
+     * Capa 1 — Filtro geográfico:
+     *   Filtra publicaciones activas cuyo código postal difiere en menos de 5000 unidades
+     *   respecto al código postal del usuario. Esto aproxima proximidad geográfica sin
+     *   necesitar coordenadas GPS.
+     *
+     * Capa 2 — K-Radius por distancia euclidiana ponderada:
+     *   Compara el vector de preferencias del usuario (obtenido de su último cuestionario)
+     *   contra el vector de atributos de cada animal. Los atributos del animal priorizan
+     *   los overrides individuales sobre los valores por defecto de la raza.
+     *
+     *   Vector del usuario:
+     *     [tiempoEjercicio, tiempoSoledad, targetSocNiños, targetSocMascotas]
+     *
+     *   Vector del animal:
+     *     [nivelEnergia, independencia, sociableNiños, sociableMascotas]
+     *
+     *   La distancia euclidiana se calcula con pesos diferenciados:
+     *     - nivelEnergia e independencia tienen peso 2.0 (más determinantes)
+     *     - sociableNiños y sociableMascotas tienen peso 1.5
+     *
+     *   El score de compatibilidad se define como:
+     *     score = 1 / (1 + distancia)
+     *   donde score=1.0 es compatibilidad perfecta y score→0 es incompatibilidad total.
+     *
+     *   Solo se devuelven animales con score >= 0.4 (umbral de compatibilidad mínima),
+     *   ordenados de mayor a menor compatibilidad.
+     *
+     * Filtros adicionales:
+     *   - Si el usuario tiene alergias (tieneAlergias=1), solo se consideran animales
+     *     de razas hipoalergénicas (esHipoalergenico=1).
+     *   - Si el usuario no ha completado el cuestionario, se devuelve lista vacía.
+     *
+     * @param token Token de sesión del usuario autenticado.
+     * @return Lista de [AnimalListItemResponse] ordenada por score descendente,
+     *         o lista vacía si no hay cuestionario o no hay candidatos compatibles.
+     */
+    fun getRecomendados(token: String): List<AnimalListItemResponse> {
+        val usuario = usuarioService.getMe(token)
+            ?: throw Exception("Token inválido")
+
+        // Obtener último formulario
+        val formularios = formularioRepository.findAllByUsuarioId(usuario.id)
+        if (formularios.isEmpty()) return emptyList()
+        val formulario = formularios.maxByOrNull { it.fechaEnvio }!!
+
+        // Capa 1: filtrar publicaciones activas por CP cercano
+        val cpUsuario = usuario.codigoPostal.toIntOrNull() ?: return emptyList()
+        var candidatos = animalRepository.findAll()
+            .filter { it.publicacion.estado == "Activa" }
+            .filter {
+                val cpAnimal = it.codigoPostal.toIntOrNull() ?: return@filter false
+                kotlin.math.abs(cpAnimal - cpUsuario) <= 5000
+            }
+
+        // Filtro duro: alergias
+        if (formulario.tieneAlergias == 1) {
+            candidatos = candidatos.filter { it.raza.esHipoalergenico == 1 }
+        }
+
+        if (candidatos.isEmpty()) return emptyList()
+
+        // Normalizar respuestas del formulario al espacio 1-5
+        val targetEnergia = formulario.tiempoEjercicio.toDouble()
+        val targetIndependencia = formulario.tiempoSoledad.toDouble()
+        val targetSocNiños = if (formulario.`tieneNiños` == 1) 5.0 else 3.0
+        val targetSocMascotas = if (formulario.tieneMascotas == 1) 5.0 else 3.0
+
+        // Pesos — ejercicio y soledad más determinantes
+        val pesoEnergia = 2.0
+        val pesoIndependencia = 2.0
+        val pesoSocNiños = 1.5
+        val pesoSocMascotas = 1.5
+
+        data class AnimalScore(val animal: AnimalEntity, val score: Double)
+
+        // Calcular score por distancia euclidiana ponderada
+        val scored = candidatos.map { animal ->
+            val energia = (animal.overrideEnergia?: animal.raza.nivelEnergia).toDouble()
+            val independ = (animal.overrideIndependencia?: animal.raza.independencia).toDouble()
+            val socNiños = (animal.overrideSociableNiños?: animal.raza.sociableNiños).toDouble()
+            val socMascotas = (animal.overrideSociableMascotas?: animal.raza.sociableMascotas).toDouble()
+
+            val distancia = Math.sqrt(
+                pesoEnergia * Math.pow(targetEnergia- energia, 2.0) +
+                        pesoIndependencia*Math.pow(targetIndependencia  - independ,    2.0) +
+                        pesoSocNiños*Math.pow(targetSocNiños      - socNiños,    2.0) +
+                        pesoSocMascotas*Math.pow(targetSocMascotas   - socMascotas, 2.0)
+            )
+
+            AnimalScore(animal, 1.0 / (1.0 + distancia))
+        }
+
+        // K-radius: solo animales con score >= umbral, ordenados por compatibilidad
+        val UMBRAL_SCORE = 0.3
+
+        return scored
+            .filter { it.score >= UMBRAL_SCORE }
+            .sortedByDescending { it.score }
+            .map { AnimalListItemResponse.from(it.animal) }
     }
 }

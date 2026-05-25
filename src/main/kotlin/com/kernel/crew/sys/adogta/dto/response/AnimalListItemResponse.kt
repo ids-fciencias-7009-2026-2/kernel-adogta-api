@@ -21,7 +21,8 @@ data class AnimalListItemResponse(
     val sociableNiños: Int,
     val sociableMascotas: Int,
     val fotos: List<String>,
-    val padecimientos: List<String>
+    val padecimientos: List<String>,
+    val estadoPublicacion: String? = null
 ) {
     companion object {
         fun from(animal: AnimalEntity): AnimalListItemResponse = AnimalListItemResponse(
@@ -43,7 +44,8 @@ data class AnimalListItemResponse(
             sociableNiños = animal.overrideSociableNiños ?: animal.raza.sociableNiños,
             sociableMascotas = animal.overrideSociableMascotas ?: animal.raza.sociableMascotas,
             fotos = animal.fotos.toList(),
-            padecimientos = animal.padecimientos.toList()
+            padecimientos = animal.padecimientos.toList(),
+            estadoPublicacion =animal.publicacion.estado
         )
     }
 }
