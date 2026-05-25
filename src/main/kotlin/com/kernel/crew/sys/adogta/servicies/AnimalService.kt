@@ -335,7 +335,7 @@ class AnimalService(
         }
 
         // K-radius: solo animales con score >= umbral, ordenados por compatibilidad
-        val UMBRAL_SCORE = 0.5
+        val UMBRAL_SCORE = 0.3
 
         return scored
             .filter { it.score >= UMBRAL_SCORE }

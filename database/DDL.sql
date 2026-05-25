@@ -445,3 +445,13 @@ COMMENT ON CONSTRAINT chk_tiene_mascotas ON Formulario IS 'El campo tiene_mascot
 COMMENT ON CONSTRAINT chk_tiempo_ejercicio ON Formulario IS 'El tiempo_ejercicio debe estar entre 0 y 5. 0 significa que no se ejercita, 5 significa que se ejercita mucho.';
 COMMENT ON CONSTRAINT chk_tiempo_soledad ON Formulario IS 'El tiempo_soledad debe estar entre 0 y 5. 0 significa que la mascota nunca está sola, 5 significa que la mascota está sola la mayor parte del día.';
 COMMENT ON CONSTRAINT chk_tiene_niños ON Formulario IS 'El campo tiene_niños solo acepta los valores 0 o 1.';
+
+-- Actualizar constraint de publicacion para incluir nuevos estados
+ALTER TABLE publicacion DROP CONSTRAINT IF EXISTS chk_estado_publicacion;
+ALTER TABLE publicacion ADD CONSTRAINT chk_estado_publicacion 
+CHECK (estado IN ('Activa', 'Pausada', 'Cerrada', 'Borrada', 'En proceso', 'Adoptado'));
+
+-- Actualizar constraint de solicitud para incluir nuevos estados
+ALTER TABLE solicitud DROP CONSTRAINT IF EXISTS chk_estado_solicitud;
+ALTER TABLE solicitud ADD CONSTRAINT chk_estado_solicitud 
+CHECK (estado IN ('Pendiente', 'Aprobada', 'Rechazada', 'Cancelada'));
