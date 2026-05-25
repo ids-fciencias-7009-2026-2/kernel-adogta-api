@@ -2,6 +2,7 @@ package com.kernel.crew.sys.adogta.servicies
 
 import com.kernel.crew.sys.adogta.dto.request.AnimalRequest
 import com.kernel.crew.sys.adogta.dto.response.AnimalListItemResponse
+import com.kernel.crew.sys.adogta.dto.response.AnimalMapaResponse
 import com.kernel.crew.sys.adogta.dto.response.AnimalResponse
 import com.kernel.crew.sys.adogta.entities.AnimalEntity
 import com.kernel.crew.sys.adogta.entities.PublicacionEntity
@@ -21,7 +22,8 @@ class AnimalService(
     private val publicacionRepository: PublicacionRepository,
     private val razaRepository: RazaRepository,
     private val usuarioRepository: UsuarioRepository,
-    private val usuarioService: UsuarioService
+    private val usuarioService: UsuarioService,
+    private val geocodificacionService: GeocodificacionService
 ) {
     private val logger = LoggerFactory.getLogger(AnimalService::class.java)
 
@@ -227,5 +229,41 @@ class AnimalService(
             ?: throw Exception("Publicación no encontrada o no eres el dueño")
         publicacion.estado = nuevoEstado
         publicacionRepository.save(publicacion)
+    }
+
+    /**
+     * Devuelve las publicaciones activas con coordenadas para el mapa.
+     *
+     * Convierte el código postal de cada animal a coordenadas lat/lng
+     * usando la tabla estática o geocodificación en tiempo real.
+     *
+     * @return Lista de [AnimalMapaResponse] con coordenadas incluidas.
+     */
+    @Transactional(readOnly = true)
+    fun listarPublicacionesParaMapa(): List<AnimalMapaResponse> {
+        logger.info("Listando publicaciones para mapa")
+
+        // Caché en memoria: no geocodificar el mismo CP dos veces en la misma llamada
+        val cacheCoordenadas = mutableMapOf<String, Pair<Double, Double>>()
+
+        return animalRepository.findAll()
+            .filter { it.publicacion.estado == "Activa" }
+            .map { animal ->
+                val coords = cacheCoordenadas.getOrPut(animal.codigoPostal) {
+                    geocodificacionService.obtenerCoordenadas(animal.codigoPostal)
+                }
+
+                AnimalMapaResponse(
+                    idPublicacion = animal.idPublicacion,
+                    idAnimal = animal.idAnimal,
+                    nombre = animal.nombre,
+                    tipo = animal.tipo,
+                    razaNombre = animal.raza.nombre,
+                    fotoPrincipal = animal.fotos.firstOrNull(),
+                    codigoPostal = animal.codigoPostal,
+                    lat = coords.first,
+                    lng = coords.second
+                )
+            }
     }
 }

@@ -24,5 +24,7 @@ fun main(args: Array<String>) {
 	System.setProperty("DOG_API_KEY", dotenv["DOG_API_KEY"])
 	System.setProperty("CAT_API_KEY", dotenv["CAT_API_KEY"])
 
+	System.setProperty("GOOGLE_MAPS_API_KEY", dotenv["GOOGLE_MAPS_API_KEY"])
+
 	runApplication<AdogtaApplication>(*args)
 }
