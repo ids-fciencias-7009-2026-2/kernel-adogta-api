@@ -123,4 +123,25 @@ class ModeracionController(
             ResponseEntity.status(400).body(mapOf("error" to e.message))
         }
     }
+
+    /**
+     * Verifica si un usuario ha levantado un reporte a una publicación.
+     * 
+     * @param token         Token de sesión del usuario.
+     * @param publicacionId ID de la publicacion para verifiar si la reportó.
+     * @return 200 y si el reporte existe, 401 sin token,
+     */
+    @GetMapping("/reportes/existe")
+    fun existeReporte(
+        @RequestHeader("Authorization", required = false) token: String?,
+        @RequestParam publicacionId: Int
+    ): ResponseEntity<Any> {
+        if (token == null) return ResponseEntity.status(401).build()
+        return try {
+            val existe = moderacionService.existeReporte(token, publicacionId)
+            ResponseEntity.ok(mapOf("existe" to existe))
+        } catch (e: Exception) {
+            ResponseEntity.status(400).body(mapOf("error" to e.message))
+        }
+    }
 }

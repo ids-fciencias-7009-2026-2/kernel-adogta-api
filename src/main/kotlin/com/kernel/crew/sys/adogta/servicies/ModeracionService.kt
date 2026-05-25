@@ -85,6 +85,7 @@ class ModeracionService(
         return ReporteResponse(
             idReporte = guardado.idReporte,
             idPublicacion = guardado.idPublicacion,
+            idAnimal = animal?.idAnimal ?: 0,
             nombreAnimal = animal?.nombre ?: "",
             motivo = guardado.motivo,
             fecha = guardado.fecha,
@@ -105,6 +106,7 @@ class ModeracionService(
             ReporteResponse(
                 idReporte = reporte.idReporte,
                 idPublicacion = reporte.idPublicacion,
+                idAnimal = animal?.idAnimal ?: 0,
                 nombreAnimal = animal?.nombre ?: "",
                 motivo = reporte.motivo,
                 fecha = reporte.fecha,
@@ -201,5 +203,20 @@ class ModeracionService(
         }
 
         return usuario.email ?: "desconocido"
+    }
+
+    /**
+     * Indica si el usuario ya reportó una publicación.
+     * 
+     * El método es concretamente para que el frontend pueda saber si un usuario
+     * ya ha reportado una publicación con anterioridad.
+     *
+     * @param token         Token de sesión del usuario.
+     * @param idPublicacion ID de la publicación.
+     * @return 'true' si el usuario ya reportó la publicación, 'false' eoc
+     */
+    fun existeReporte(token: String, idPublicacion: Int): Boolean {
+        val usuario = usuarioService.getAsEntity(token) ?: return false
+        return reporteRepository.existsByUsuarioIdAndPublicacionId(usuario.id!!, idPublicacion)
     }
 }

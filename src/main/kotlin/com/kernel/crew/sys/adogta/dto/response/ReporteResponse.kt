@@ -10,6 +10,8 @@ data class ReporteResponse(
     val idReporte: Long,
     /** ID de la publicación reportada. */
     val idPublicacion: Int,
+    /** ID del animal */
+    val idAnimal: Int,
     /** Nombre del animal de la publicación. */
     val nombreAnimal: String,
     /** Motivo del reporte. */
