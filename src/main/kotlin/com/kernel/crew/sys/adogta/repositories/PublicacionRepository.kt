@@ -25,4 +25,11 @@ interface PublicacionRepository : JpaRepository<PublicacionEntity, PublicacionId
      * @return Lista de publicaciones asociadas.
      */
     fun findByIdUsuario(idUsuario: Int): List<PublicacionEntity>
+
+    /**
+     * Busca las publicaciones solo por su ID de publicación.
+     * @param idPublicacion ID de la publicación.
+     * @return Lista de publicaciones.
+     */
+    fun findByIdPublicacion(idPublicacion: Int): List<PublicacionEntity>
 }

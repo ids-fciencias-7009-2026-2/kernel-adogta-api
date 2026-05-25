@@ -12,6 +12,8 @@ import com.kernel.crew.sys.adogta.repositories.UsuarioRepository
 import com.kernel.crew.sys.adogta.dto.request.ForgotPasswordRequest
 import com.kernel.crew.sys.adogta.dto.request.ResetPasswordRequest
 import com.kernel.crew.sys.adogta.dto.response.MessageResponse
+import com.kernel.crew.sys.adogta.repositories.AdministradorRepository
+import com.kernel.crew.sys.adogta.repositories.BanRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -38,6 +40,12 @@ class UsuarioService {
 
     @Autowired
     lateinit var emailService: EmailService
+
+    @Autowired
+    lateinit var administradorRepository: AdministradorRepository
+
+    @Autowired
+    lateinit var banRepository: BanRepository
 
     /**
      * Duración de la sesión deslizante en horas.
@@ -75,12 +83,19 @@ class UsuarioService {
      * genera un token UUID y establece la fecha de expiración deslizante.
      *
      * @param request Credenciales de acceso (email y contraseña).
-     * @return Token de sesión generado, o null si las credenciales son incorrectas.
+     * @return Token de sesión generado, null si las credenciales son incorrectas, motivo en caso de baneo.
      */
     fun login(request: LoginRequest): String? {
         logger.info("Intento de login: ${request.email}")
 
         val usuario = usuarioRepository.findByEmail(request.email) ?: return null
+
+        // Si está baneado. regresamos el motivo.
+        if (banRepository.existsByUsuarioId(usuario.id!!)) {
+            logger.warn("Intento de login de usuario baneado: ${request.email}")
+            val motivo = banRepository.findMotivoBanByUsuarioId(usuario.id!!) ?: "Violación de normas comunitarias"
+            return "BANEADO:$motivo"
+        }
 
         val passwordHash = hashPassword(request.password)
         if (passwordHash != usuario.contrasena) return null
@@ -287,4 +302,5 @@ class UsuarioService {
             .digest(password.toByteArray())
         return bytes.joinToString("") { "%02x".format(it) }
     }
+
 }

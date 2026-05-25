@@ -82,16 +82,24 @@ class UsuarioController {
      *
      * @param request Credenciales de acceso del usuario (email y password).
      * @return 200 con un mapa que contiene el token de sesión generado,
-     *         o 401 si las credenciales son incorrectas.
+     *         401 si las credenciales son incorrectas, 403 si ha sido baneado.
      */
     @PostMapping("/login")
     fun login(@RequestBody request: LoginRequest): ResponseEntity<Any> {
         logger.info("POST /usuarios/login - ${request.email}")
 
-        val token = usuarioService.login(request)
-            ?: return ResponseEntity.status(401).body(mapOf("error" to "Credenciales incorrectas"))
+        val resultado = usuarioService.login(request)
 
-        return ResponseEntity.ok(mapOf("token" to token))
+        // En caso de baneo.
+        if (resultado?.startsWith("BANEADO:") == true) {
+            val motivo = resultado.substringAfter("BANEADO:")
+            return ResponseEntity.status(403).body(mapOf("error" to "Tu cuenta ha sido suspendida.", "motivo" to motivo))
+        }
+        if (resultado == null) {
+            return ResponseEntity.status(401).body(mapOf("error" to "Credenciales incorrectas"))
+        }
+
+        return ResponseEntity.ok(mapOf("token" to resultado))
     }
 
     /**
