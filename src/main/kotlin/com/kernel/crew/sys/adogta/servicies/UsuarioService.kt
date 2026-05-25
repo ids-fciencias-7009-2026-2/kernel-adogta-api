@@ -83,17 +83,18 @@ class UsuarioService {
      * genera un token UUID y establece la fecha de expiración deslizante.
      *
      * @param request Credenciales de acceso (email y contraseña).
-     * @return Token de sesión generado, o null si las credenciales son incorrectas.
+     * @return Token de sesión generado, null si las credenciales son incorrectas, motivo en caso de baneo.
      */
     fun login(request: LoginRequest): String? {
         logger.info("Intento de login: ${request.email}")
 
         val usuario = usuarioRepository.findByEmail(request.email) ?: return null
 
-        // Si está baneado.
+        // Si está baneado. regresamos el motivo.
         if (banRepository.existsByUsuarioId(usuario.id!!)) {
             logger.warn("Intento de login de usuario baneado: ${request.email}")
-            return null
+            val motivo = banRepository.findMotivoBanByUsuarioId(usuario.id!!) ?: "Violación de normas comunitarias"
+            return "BANEADO:$motivo"
         }
 
         val passwordHash = hashPassword(request.password)
