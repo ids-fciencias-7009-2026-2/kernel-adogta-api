@@ -16,6 +16,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
+import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 
@@ -72,10 +73,9 @@ class RazaService(
 
         val temperament = match.temperament ?: ""
         val llmResponse = mapearRasgosConLlm(LlmMapRequest(nombre = match.name, texto_a_clasificar = temperament))
-            ?: return null
 
-        val nombre = llmResponse.nombre ?: match.name
-        val personalidad = llmResponse.temperamento ?: ""
+        val nombre = llmResponse.nombre
+        val personalidad = llmResponse.temperamento
         val nivelEnergia = llmResponse.nivelEnergia.coerceIn(1, 5)
         val sociableNinos = llmResponse.sociableNiños.coerceIn(1, 5)
         val sociableMascotas = llmResponse.sociableMascotas.coerceIn(1, 5)
@@ -160,7 +160,7 @@ class RazaService(
         }
     }
 
-    private fun mapearRasgosConLlm(request: LlmMapRequest): LlmMapResponse? {
+    private fun mapearRasgosConLlm(request: LlmMapRequest): LlmMapResponse {
         return try {
             val uri = UriComponentsBuilder.fromUriString("$llmBaseUrl/clasificar-temperamento")
                 .build()
@@ -171,10 +171,19 @@ class RazaService(
                 HttpEntity(request),
                 LlmMapResponse::class.java
             )
-            response.body
+            response.body ?: throw RuntimeException("El microservicio LLM devolvió una respuesta vacía")
+        } catch (ex: HttpStatusCodeException) {
+            val rawBody = ex.responseBodyAsString
+            val detail = Regex("\"detail\"\\s*:\\s*\"([^\"]+)\"")
+                .find(rawBody)
+                ?.groupValues
+                ?.getOrNull(1)
+                ?: "Error interno en el microservicio LLM"
+            logger.warn("Error consultando LLM API (status={}): {}", ex.statusCode.value(), detail)
+            throw RuntimeException(detail)
         } catch (ex: Exception) {
             logger.warn("Error consultando LLM API: {}", ex.message)
-            null
+            throw RuntimeException("No se pudo procesar la solicitud con el microservicio LLM")
         }
     }
 

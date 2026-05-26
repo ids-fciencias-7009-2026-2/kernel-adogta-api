@@ -74,11 +74,15 @@ class RazaController {
     fun agregarRaza(@RequestBody request: RazaCreateRequest): ResponseEntity<RazaResponse> {
         logger.info("POST /api/razas - tipo={} nombre={}", request.tipo, request.nombre)
 
-        val respuesta = razaService.crearRaza(request)
-        return if (respuesta.mensaje != null) {
-            ResponseEntity.status(404).body(respuesta)
-        } else {
-            ResponseEntity.ok(respuesta)
+        return try {
+            val respuesta = razaService.crearRaza(request)
+            if (respuesta.mensaje != null) {
+                ResponseEntity.status(404).body(respuesta)
+            } else {
+                ResponseEntity.ok(respuesta)
+            }
+        } catch (ex: RuntimeException) {
+            ResponseEntity.status(500).body(RazaResponse.error(ex.message ?: "Error interno en el microservicio LLM"))
         }
     }
 }
