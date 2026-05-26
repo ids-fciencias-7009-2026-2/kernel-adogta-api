@@ -454,7 +454,7 @@ COMMENT ON CONSTRAINT chk_tiene_niños ON Formulario IS 'El campo tiene_niños s
 -- Actualizar constraint de publicacion para incluir nuevos estados
 ALTER TABLE publicacion DROP CONSTRAINT IF EXISTS chk_estado_publicacion;
 ALTER TABLE publicacion ADD CONSTRAINT chk_estado_publicacion 
-CHECK (estado IN ('Activa', 'Pausada', 'Cerrada', 'Borrada', 'En proceso', 'Adoptado'));
+CHECK (estado IN ('Activa', 'Pausada', 'Cerrada', 'Borrada', 'En proceso', 'En revision', 'Suspendida', 'Adoptado'));
 
 -- Actualizar constraint de solicitud para incluir nuevos estados
 ALTER TABLE solicitud DROP CONSTRAINT IF EXISTS chk_estado_solicitud;

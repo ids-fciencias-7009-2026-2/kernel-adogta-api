@@ -12,3 +12,5 @@ SELECT * FROM Animal;
 SELECT * FROM Raza;
 
 SELECT * FROM formulario;
+
+select * from reporte;
