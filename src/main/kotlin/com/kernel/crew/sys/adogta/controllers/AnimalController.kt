@@ -192,6 +192,24 @@ class AnimalController {
     }
 
     /**
+     * Devuelve las publicaciones activas con coordenadas para el mapa.
+     *
+     * Endpoint público (no requiere token).
+     *
+     * @return 200 con lista de [AnimalMapaResponse], 500 si hay error.
+     */
+    @GetMapping("/mapa")
+    fun listarParaMapa(): ResponseEntity<Any> {
+        logger.info("GET /api/animales/mapa")
+        return try {
+            ResponseEntity.ok(animalService.listarPublicacionesParaMapa())
+        } catch (e: Exception) {
+            logger.warn("Error al listar publicaciones para mapa: ${e.message}")
+            ResponseEntity.status(500).body(mapOf("error" to e.message))
+        }
+    }
+
+    /**
      * Devuelve una lista de animales recomendados para el usuario autenticado.
      *
      * Requiere que el usuario haya completado el cuestionario de adopción.
