@@ -171,7 +171,7 @@ class RazaService(
                 HttpEntity(request),
                 LlmMapResponse::class.java
             )
-            response.body ?: throw RuntimeException("El microservicio LLM devolvió una respuesta vacía")
+            response.body ?: throw RuntimeException("No se puedo procesar la solicitud")
         } catch (ex: HttpStatusCodeException) {
             val rawBody = ex.responseBodyAsString
             val detail = Regex("\"detail\"\\s*:\\s*\"([^\"]+)\"")
@@ -183,7 +183,7 @@ class RazaService(
             throw RuntimeException(detail)
         } catch (ex: Exception) {
             logger.warn("Error consultando LLM API: {}", ex.message)
-            throw RuntimeException("No se pudo procesar la solicitud con el microservicio LLM")
+            throw RuntimeException("No se pudo procesar la solicitud")
         }
     }
 
