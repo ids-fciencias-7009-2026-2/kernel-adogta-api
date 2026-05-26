@@ -45,12 +45,18 @@ class RazaService(
         }
 
         val nombreNormalizado = normalizar(request.nombre)
+        val tipoBd = if (tipoEntrada == "perro") "Perro" else "Gato"
+        try {
+            buscarLocalmente(nombreNormalizado, tipoBd)?.let {
+                return RazaResponse.error("La raza ya existe")
+            }
+        } catch (ex: Exception) {
+            logger.warn("Error verificando existencia local de raza: {}", ex.message)
+        }
         if (nombreNormalizado.length < 3) {
             logger.warn("Nombre de raza inválido (len<3): {}", request.nombre)
             return RazaResponse.error(MENSAJE_NO_EXISTE)
         }
-
-        val tipoBd = if (tipoEntrada == "perro") "Perro" else "Gato"
 
         val razaNueva = if (tipoEntrada == "perro") {
             obtenerRazaPerro(nombreNormalizado, tipoBd)
@@ -199,6 +205,15 @@ class RazaService(
             .replace(Regex("[^a-z ]"), "")
             .replace(Regex("\\s+"), " ")
             .trim()
+    }
+
+    private fun buscarLocalmente(nombre: String, tipo: String): RazaEntity? {
+        return try {
+            razaRepository.findAllByTipo(tipo).firstOrNull { normalizar(it.nombre) == normalizar(nombre) }
+        } catch (ex: Exception) {
+            logger.warn("Error buscando raza localmente: {}", ex.message)
+            null
+        }
     }
 
     companion object {
