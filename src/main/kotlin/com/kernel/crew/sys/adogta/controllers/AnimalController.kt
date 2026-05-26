@@ -208,4 +208,30 @@ class AnimalController {
             ResponseEntity.status(500).body(mapOf("error" to e.message))
         }
     }
+
+    /**
+     * Devuelve una lista de animales recomendados para el usuario autenticado.
+     *
+     * Requiere que el usuario haya completado el cuestionario de adopción.
+     * Aplica filtro geográfico por código postal y algoritmo K-Radius
+     * basado en distancia euclidiana ponderada entre el perfil del usuario
+     * y los atributos del animal.
+     *
+     * @param token Token de sesión en el header Authorization.
+     * @return 200 con lista de [AnimalListItemResponse] ordenada por compatibilidad,
+     *         401 si no hay token,
+     *         500 si ocurre un error interno.
+     */
+    @GetMapping("/recomendados")
+    fun getRecomendados(
+        @RequestHeader("Authorization", required = false) token: String?
+    ): ResponseEntity<Any> {
+        if (token == null) return ResponseEntity.status(401).build()
+        return try {
+            ResponseEntity.ok(animalService.getRecomendados(token))
+        } catch (e: Exception) {
+            logger.warn("Error al obtener recomendados: ${e.message}")
+            ResponseEntity.status(500).body(mapOf("error" to e.message))
+        }
+    }
 }

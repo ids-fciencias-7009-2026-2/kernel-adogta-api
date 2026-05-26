@@ -1,7 +1,5 @@
 package com.kernel.crew.sys.adogta.domain
 
-import kotlin.math.roundToInt
-
 /**
  * Convierte rasgos de temperamento (solo peso y si es hipoalergenico) de 
  * The Dog API a atributos numéricos.

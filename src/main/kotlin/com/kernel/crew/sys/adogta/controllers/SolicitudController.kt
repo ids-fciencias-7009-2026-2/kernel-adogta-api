@@ -1,16 +1,21 @@
 package com.kernel.crew.sys.adogta.controllers
 
 import com.kernel.crew.sys.adogta.dto.request.SolicitudRequest
+import com.kernel.crew.sys.adogta.dto.response.SolicitudResponse
 import com.kernel.crew.sys.adogta.servicies.SolicitudService
 import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PutMapping
 
 /**
  * Controlador REST que expone los endpoints relacionados con la entidad Solicitud.
@@ -29,6 +34,8 @@ class SolicitudController {
 
     @Autowired
     lateinit var solicitudService: SolicitudService
+
+
 
     /**
      * Registra el interés de un adoptante en un animal publicado.
@@ -72,4 +79,99 @@ class SolicitudController {
             ResponseEntity.status(500).body(mapOf("error" to e.message))
         }
     }
+
+    /**
+     * Endpoint para verificar si el usuario actual a expresado su interes respecto a una publiaicon
+     * especifica.
+     *
+     * @param token Token de sesion del usuario actual.
+     * @param idPublicacion el identificador de una publicacion de algun animal.
+     * @return Success en formato 200 para indicar que es verdadera la expresion de interes.
+     * */
+    @GetMapping("/verificar/{idPublicacion}")
+    open fun verificarInteres(@RequestHeader("Authorization", required = false) token: String?, @PathVariable idPublicacion: Int): ResponseEntity<Any> {
+        if (token == null)
+            return ResponseEntity.status(401).build()
+        try {
+            val estaExpresado = solicitudService.verificaInteres(token, idPublicacion)
+            return ResponseEntity.ok().body(mapOf("interes_expresado" to estaExpresado))
+        } catch (e: IllegalArgumentException) {
+            logger.warn("Solicitud invalida: ${e.message}")
+            return ResponseEntity.status(400).body(mapOf("error" to e.message))
+        }
+    }
+
+    /**
+     *  Metodo que devuelve la lista de solictiudes realizadas por un usuario de tipo <SolictudResponse>
+     *  Verifica que haya un inicio de sesion, posteriormente  regresa todas las solicitudes hechas por
+     *  dicho usuario.
+     *
+     *  @param token Token de sesion del usuario actual.
+     *  @return una lista List<SolicitudResponse> si no hay ningun problema.
+     * */
+    @GetMapping("/mis-solicitudes")
+    open fun obtenerTodasSolicitudes(@RequestHeader("Authorization", required = false) token: String?): ResponseEntity<Any> {
+        if (token == null)
+            return ResponseEntity.status(401).build()
+        try {
+            val solicitudes = solicitudService.getAllSolicitudes(token)
+            return ResponseEntity.ok(solicitudes)
+        } catch (e: Exception) {
+            logger.warn("Solicitud invalida: ${e.message}")
+            return ResponseEntity.status(400).body(mapOf("error" to e.message))
+        }
+    }
+
+    /**
+     * Metodo que regresa una lista de todos los interesados en una publicacion. El endopoint
+     * GET /por-publicacion/{idPublicaicon} recibe el id correspondiente a una publiacion y regresa
+     * la lista de todos los solicitantes.
+     *
+     * @param idPublicacion Id de la publicacion.
+     * @param token El token de sesion del usuario actual que consuma la API.
+     * @return La lista de todos los usuarios solicitantes interesados.
+     * */
+
+    @GetMapping("/por-publicacion/{idPublicacion}")
+    open fun obtenerInteresados(
+        @RequestHeader("Authorization", required = false) token: String?,
+        @PathVariable idPublicacion: Int): ResponseEntity<Any> {
+        if (token == null)
+            return ResponseEntity.status(401).build()
+        try {
+            val interesados = solicitudService.getAllInteresados(token, idPublicacion)
+            return ResponseEntity.ok(interesados)
+        } catch (e: Exception){
+            logger.warn("Solicitud obtener interesados ex: $e")
+            return ResponseEntity.status(400).body(mapOf("error" to e.message))
+        }
+    }
+
+    /**
+     * Metodo que dado el id de la solicitud recibida, modifica la solicitud
+     * para dar el siguiente paso, "En proceso" que establece una comunicacion via
+     * correo con el usuario adoptante.
+     *
+     * @param idSolicitud Id de la solicitud de interes.
+     * @param token Token de sesion actual para el usuario que consuma la API.
+     * @return Mensaje de exito o fracaso si se proceso correctamente.
+     * */
+
+    @PutMapping("/{idSolicitud}/iniciar-tramite")
+    open fun iniciarTramite(
+        @RequestHeader("Authorization", required = false) token: String?,
+        @PathVariable idSolicitud: Int): ResponseEntity<Any> {
+        if (token == null)
+            return ResponseEntity.status(401).build()
+        try {
+            val tramiteIniciado = solicitudService.inicioTramite(token, idSolicitud)
+            if (tramiteIniciado)
+                return ResponseEntity.ok(mapOf("iniciado" to tramiteIniciado))
+            return ResponseEntity.status(400).body(mapOf("error" to "No se completo el tramite"))
+        }catch (e: Exception){
+            logger.warn("Solicitud inicar tramite ex: $e ")
+            return ResponseEntity.status(400).body(mapOf("error" to e.message))
+        }
+    }
+
 }

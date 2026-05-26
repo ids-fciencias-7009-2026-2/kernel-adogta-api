@@ -25,7 +25,6 @@ interface FormularioRepository : JpaRepository<FormularioEntity, Long> {
      * Consulta a la base de datos para obtener la fecha en la que el
      * usuario envió su último formulario
      */
-    @Query("SELECT fecha_envio FROM formulario WHERE id_usuario = :id_usuario",
-        nativeQuery = true)
-    fun getFechaEnvioFormulario(@Param("id_usuario") id_usuario: Long): LocalDate?
+    @Query(value = "SELECT MAX(fecha_envio) FROM formulario WHERE id_usuario = :idUsuario", nativeQuery = true)
+    fun getFechaEnvioFormulario(@Param("idUsuario") idUsuario: Long): LocalDate?
 }

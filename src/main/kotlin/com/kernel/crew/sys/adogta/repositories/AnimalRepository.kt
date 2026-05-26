@@ -34,4 +34,5 @@ interface AnimalRepository : JpaRepository<AnimalEntity, AnimalId> {
      * @return El animal si existe, null en caso contrario.
      */
     fun findByIdAnimal(idAnimal: Int): AnimalEntity?
+
 }
