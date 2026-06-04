@@ -19,44 +19,43 @@ INSERT INTO Usuario (id_usuario, nombres, apellido_paterno, apellido_materno, em
 VALUES (1, 'admin', 'howard', 'benson', 'admin@adogta.com', NULL, '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', TRUE, '2026-01-01', '06600', '5512345678', 'local', NULL, NULL, NULL, NULL, TRUE, TRUE, FALSE);
 
 -- Administradores
-INSERT INTO Administrador (email, contrasena, nombres, apellido_paterno) VALUES
-    ('marco-rubio@adogta.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Marco',    'Rubio'),
-    ('daniela@adogta.com',     '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Daniela',  'Flores'),
-    ('patricio@adogta.com',    '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Patricio', 'Castillo'),
-    ('luis@adogta.com',        '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Luis',     'Carrillo'),
-    ('marco-raya@adogta.com',  '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Marco',    'Raya'),
-    ('karla@adogta.com',       '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Karla',    'García');
+INSERT INTO Administrador (id_administrador, email, contrasena, nombres, apellido_paterno) VALUES
+       (1, 'marco-rubio@adogta.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Marco',    'Rubio'),
+       (2, 'daniela@adogta.com',     '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Daniela',  'Flores'),
+       (3, 'patricio@adogta.com',    '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Patricio', 'Castillo'),
+       (4, 'luis@adogta.com',        '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Luis',     'Carrillo'),
+       (5, 'marco-raya@adogta.com',  '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Marco',    'Raya'),
+       (6, 'karla@adogta.com',       '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Karla',    'Sheridam');
 
 -- Razas: 11 perros (id 1-11), 11 gatos (id 12-22)
-INSERT INTO Raza (nombre, tipo, talla, independencia, nivel_energia, personalidad, sociable_niños, sociable_mascotas, es_hipoalergenico) VALUES
-('Sin Raza Especifica', 'Perro', 3, 3, 3, '',                                                  3, 3, 0),  -- id=1
-('Chihuahua',           'Perro', 1, 4, 4, 'Vivaz, alerta, valiente',                           2, 2, 0),  -- id=2
-('Pastor Alemán',       'Perro', 5, 3, 5, 'Inteligente, protector y trabajador',               4, 3, 0),  -- id=3
-('Poodle',              'Perro', 3, 3, 4, 'Listo, elegante, hipoalergénico',                   5, 4, 1),  -- id=4
-('Beagle',              'Perro', 2, 3, 4, 'Curioso y sociable',                                5, 5, 0),  -- id=5
-('Labrador Retriever',  'Perro', 4, 2, 5, 'Amigable, leal y juguetón',                        5, 4, 0),  -- id=6
-('Golden Retriever',    'Perro', 4, 2, 5, 'Enérgico, amistoso y confiable',                   5, 4, 0),  -- id=7
-('Schnauzer',           'Perro', 3, 3, 4, 'Amistoso, activo y listo',                         4, 4, 1),  -- id=8
-('Bulldog Francés',     'Perro', 2, 4, 3, 'Gentil, afectuoso y tranquilo',                    4, 3, 0),  -- id=9
-('Border Collie',       'Perro', 4, 3, 5, 'Leal, obediente y activo',                         4, 4, 0),  -- id=10
-('Bichón Frisé',        'Perro', 3, 3, 3, 'Juguetón, sociable y cariñoso',                   5, 5, 1),  -- id=11
-('Sin Raza Especifica', 'Gato',  3, 3, 3, '',                                                  3, 3, 0),  -- id=12
-('Persa',               'Gato',  2, 4, 2, 'Tranquilo, cariñoso, de bajo mantenimiento',       3, 3, 0),  -- id=13
-('Siamés',              'Gato',  2, 3, 4, 'Vocal, curioso, muy social',                       4, 3, 0),  -- id=14
-('Maine Coon',          'Gato',  4, 3, 3, 'Gentil gigante, amistoso',                         5, 4, 0),  -- id=15
-('Británico',           'Gato',  2, 4, 3, 'Independiente, reservado y elegante',              2, 2, 0),  -- id=16
-('Sphynx',              'Gato',  2, 3, 3, 'Cariñoso, tranquilo y adaptable',                  4, 4, 1),  -- id=17
-('Bengalí',             'Gato',  3, 4, 4, 'Curioso, activo, aventurero',                      3, 4, 0),  -- id=18
-('Ragdoll',             'Gato',  2, 3, 2, 'Suave, dócil y silencioso',                        5, 5, 0),  -- id=19
-('Balinés',             'Gato',  2, 4, 3, 'Juguetón, inteligente y activo',                   3, 3, 1),  -- id=20
-('Bosque de Noruega',   'Gato',  3, 3, 3, 'Leal, calmado y afectuoso',                        4, 4, 0),  -- id=21
-('Abisinio',            'Gato',  2, 4, 4, 'Enérgico, curioso y sociable',                     4, 5, 0);  -- id=22
+INSERT INTO Raza (id_raza, nombre, tipo, talla, independencia, nivel_energia, personalidad, sociable_niños, sociable_mascotas, es_hipoalergenico) VALUES
+(1,  'Sin Raza Especifica', 'Perro', 3, 3, 3, '',                                                  3, 3, 0),
+(2,  'Chihuahua',           'Perro', 1, 4, 4, 'Vivaz, alerta, valiente',                           2, 2, 0),
+(3,  'Pastor Alemán',       'Perro', 5, 3, 5, 'Inteligente, protector y trabajador',               4, 3, 0),
+(4,  'Poodle',              'Perro', 3, 3, 4, 'Listo, elegante, hipoalergénico',                   5, 4, 1),
+(5,  'Beagle',              'Perro', 2, 3, 4, 'Curioso y sociable',                                5, 5, 0),
+(6,  'Labrador Retriever',  'Perro', 4, 2, 5, 'Amigable, leal y juguetón',                        5, 4, 0),
+(7,  'Golden Retriever',    'Perro', 4, 2, 5, 'Enérgico, amistoso y confiable',                   5, 4, 0),
+(8,  'Schnauzer',           'Perro', 3, 3, 4, 'Amistoso, activo y listo',                         4, 4, 1),
+(9,  'Bulldog Francés',     'Perro', 2, 4, 3, 'Gentil, afectuoso y tranquilo',                    4, 3, 0),
+(10, 'Border Collie',       'Perro', 4, 3, 5, 'Leal, obediente y activo',                         4, 4, 0),
+(11, 'Bichón Frisé',        'Perro', 3, 3, 3, 'Juguetón, sociable y cariñoso',                     5, 5, 1),
+(12, 'Sin Raza Especifica', 'Gato',  3, 3, 3, '',                                                  3, 3, 0),
+(13, 'Persa',               'Gato',  2, 4, 2, 'Tranquilo, cariñoso, de bajo mantenimiento',       3, 3, 0),
+(14, 'Siamés',              'Gato',  2, 3, 4, 'Vocal, curioso, muy social',                       4, 3, 0),
+(15, 'Maine Coon',          'Gato',  4, 3, 3, 'Gentil gigante, amistoso',                         5, 4, 0),
+(16, 'Británico',           'Gato',  2, 4, 3, 'Independiente, reservado y elegante',              2, 2, 0),
+(17, 'Sphynx',              'Gato',  2, 3, 3, 'Cariñoso, tranquilo y adaptable',                  4, 4, 1),
+(18, 'Bengalí',             'Gato',  3, 4, 4, 'Curioso, activo, aventurero',                      3, 4, 0),
+(19, 'Ragdoll',             'Gato',  2, 3, 2, 'Suave, dócil y silencioso',                        5, 5, 0),
+(20, 'Balinés',             'Gato',  2, 4, 3, 'Juguetón, inteligente y activo',                   3, 3, 1),
+(21, 'Bosque de Noruega',   'Gato',  3, 3, 3, 'Leal, calmado y afectuoso',                        4, 4, 0),
+(22, 'Abisinio',            'Gato',  2, 4, 4, 'Enérgico, curioso y sociable',                     4, 5, 0);
 
 
 -- ============================================================
 -- NUEVOS USUARIOS DE PRUEBA (ids 2-18)
--- Cubre: donantes puros, adoptantes puros, roles duales,
---        autenticación local y Google OAuth.
+-- Cubre: donantes puros, adoptantes puros, roles duales.
 -- ============================================================
 
 -- id=2  Sofía Martínez  — donante puro (3 publicaciones activas, 1 adicional)
@@ -115,17 +114,19 @@ VALUES (14, 'Fernanda', 'Ríos', 'Aguilar', 'fernanda.rios@example.com', '03ac67
 INSERT INTO Usuario (id_usuario, nombres, apellido_paterno, apellido_materno, email, contrasena, acepta_terminos, fecha_acepta_terminos, codigo_postal, telefono, proveedor_autenticacion, es_adoptante, es_donante, envio_formulario)
 VALUES (15, 'Andrés', 'Jiménez', 'Peña', 'andres.jimenez@example.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', TRUE, '2025-08-10', '09400', '5555554014', 'local', TRUE, FALSE, TRUE);
 
--- id=16 Paola Gutiérrez  — adoptante + donante, autenticación GOOGLE, con alergias
-INSERT INTO Usuario (id_usuario, nombres, apellido_paterno, apellido_materno, email, google_id, contrasena, acepta_terminos, fecha_acepta_terminos, codigo_postal, telefono, proveedor_autenticacion, es_adoptante, es_donante, envio_formulario)
-VALUES (16, 'Paola', 'Gutiérrez', 'Fuentes', 'paola.gutierrez@gmail.com', '112233445566778899', NULL, TRUE, '2025-09-03', '01000', '5566665015', 'google', TRUE, TRUE, FALSE);
+-- id=16 Paola Gutiérrez  — adoptante + donante, con alergias
+INSERT INTO Usuario (id_usuario, nombres, apellido_paterno, apellido_materno, email, contrasena, acepta_terminos, fecha_acepta_terminos, codigo_postal, telefono, proveedor_autenticacion, es_adoptante, es_donante, envio_formulario)
+VALUES (16, 'Paola', 'Gutiérrez', 'Fuentes', 'paola.gutierrez@gmail.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', TRUE, '2025-09-03', '01000', '5566665015', 'local', TRUE, TRUE, FALSE);
+
 
 -- id=17 Alejandro Núñez  — donante puro (publicación activa + publicación borrada)
 INSERT INTO Usuario (id_usuario, nombres, apellido_paterno, apellido_materno, email, contrasena, acepta_terminos, fecha_acepta_terminos, codigo_postal, telefono, proveedor_autenticacion, es_adoptante, es_donante, envio_formulario)
 VALUES (17, 'Alejandro', 'Núñez', 'Paredes', 'alejandro.nunez@example.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', TRUE, '2025-10-01', '07200', '5577776016', 'local', FALSE, TRUE, FALSE);
 
--- id=18 Carolina Díaz  — adoptante puro, autenticación GOOGLE, con alergias
-INSERT INTO Usuario (id_usuario, nombres, apellido_paterno, apellido_materno, email, google_id, contrasena, acepta_terminos, fecha_acepta_terminos, codigo_postal, telefono, proveedor_autenticacion, es_adoptante, es_donante, envio_formulario)
-VALUES (18, 'Carolina', 'Díaz', 'Lozano', 'carolina.diaz@gmail.com', '998877665544332211', NULL, TRUE, '2025-11-15', '16000', '5588887017', 'google', TRUE, FALSE, TRUE);
+-- id=18 Carolina Díaz  — adoptante puro, autenticación LOCAL, con alergias
+INSERT INTO Usuario (id_usuario, nombres, apellido_paterno, apellido_materno, email, contrasena, acepta_terminos, fecha_acepta_terminos, codigo_postal, telefono, proveedor_autenticacion, es_adoptante, es_donante, envio_formulario)
+VALUES (18, 'Carolina', 'Díaz', 'Lozano', 'carolina.diaz@gmail.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', TRUE, '2025-11-15', '16000', '5588887017', 'local', TRUE, FALSE, TRUE);
+
 
 
 -- ============================================================
@@ -170,11 +171,12 @@ INSERT INTO Publicacion (id_publicacion, id_usuario, estado) VALUES (13, 13, 'Ac
 INSERT INTO Animal (id_animal, id_publicacion, id_usuario, nombre, estado_vacunacion, esterilizado, descripcion, entrenado, codigo_postal, edad, tipo, id_raza, override_energia, override_independencia, override_sociable_niños, override_sociable_mascotas)
 VALUES (13, 13, 13, 'Titán', 'Completo', TRUE, 'Titán es un Schnauzer Miniatura de 20 meses. Hipoalergénico, listo y muy amigable. Sabe las órdenes básicas y convive bien con niños y otros perros. Busco nuevo hogar por mudanza al extranjero. Incluyo todos sus accesorios y su historial médico.', TRUE, '04000', 20, 'Perro', 8, NULL, NULL, NULL, NULL);
 
--- Publicacion 14 — usuario 16 (Paola, Google), Activa — Sphynx hipoalergénico
+-- Publicacion 14 — usuario 16 (Paola), Activa — Sphynx hipoalergénico
 INSERT INTO Publicacion (id_publicacion, id_usuario, estado) VALUES (14, 16, 'Activa');
 -- Animal 14: Isis, Sphynx (hipoalergénico, no le gustan otras mascotas — override)
 INSERT INTO Animal (id_animal, id_publicacion, id_usuario, nombre, estado_vacunacion, esterilizado, descripcion, entrenado, codigo_postal, edad, tipo, id_raza, override_energia, override_independencia, override_sociable_niños, override_sociable_mascotas)
 VALUES (14, 14, 16, 'Isis', 'Completo', TRUE, 'Isis es una Sphynx de 16 meses, sin pelo y completamente hipoalergénica. Es muy cariñosa con las personas pero prefiere ser la única mascota del hogar. Necesita temperatura cálida. Perfecta para quien quiera compañía constante sin alergias.', FALSE, '01000', 16, 'Gato', 17, NULL, NULL, NULL, 2);
+
 
 -- Publicacion 15 — usuario 17 (Alejandro), Activa — Border Collie independiente
 INSERT INTO Publicacion (id_publicacion, id_usuario, estado) VALUES (15, 17, 'Activa');
@@ -421,15 +423,16 @@ VALUES (7, 13, 5, 0, '2025-04-25', 1, 5, 3, 0);
 INSERT INTO Formulario (id_formulario, id_usuario, presupuesto, tiene_alergias, fecha_envio, tiene_mascotas, tiempo_ejercicio, tiempo_soledad, tiene_niños)
 VALUES (8, 15, 1, 0, '2025-08-15', 0, 1, 5, 0);
 
--- Formulario 9 — usuario 16 (Paola, Google): ALERGIAS, sin ejercicio, soledad alta, sin niños, con mascotas
+-- Formulario 9 — usuario 16 (Paola): ALERGIAS, sin ejercicio, soledad alta, sin niños, con mascotas
 -- Solo compatible con hipoalergénicos: Poodle, Schnauzer, Bichón Frisé, Sphynx, Balinés
 INSERT INTO Formulario (id_formulario, id_usuario, presupuesto, tiene_alergias, fecha_envio, tiene_mascotas, tiempo_ejercicio, tiempo_soledad, tiene_niños)
 VALUES (9, 16, 1, 1, '2025-09-10', 1, 1, 5, 0);
 
--- Formulario 10 — usuario 18 (Carolina, Google): ALERGIAS, presupuesto medio, con mascotas, moderada
+-- Formulario 10 — usuario 18 (Carolina): ALERGIAS, presupuesto medio, con mascotas, moderada
 -- Compatible con: Schnauzer, Bichón, Sphynx (hipoalergénicos)
 INSERT INTO Formulario (id_formulario, id_usuario, presupuesto, tiene_alergias, fecha_envio, tiene_mascotas, tiempo_ejercicio, tiempo_soledad, tiene_niños)
 VALUES (10, 18, 3, 1, '2025-11-20', 1, 1, 3, 0);
+
 
 
 -- ============================================================
