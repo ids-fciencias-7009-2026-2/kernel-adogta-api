@@ -388,7 +388,7 @@ CREATE TABLE Reporte (
     FOREIGN KEY (id_administrador)                    REFERENCES Administrador(id_administrador),
 
     CONSTRAINT chk_estado_reporte CHECK (
-        estado IN ('Pendiente', 'En Revisión', 'Atendido', 'Desestimado')
+        estado IN ('Pendiente', 'Atendido', 'Desestimado')
     )
 );
 
@@ -400,13 +400,13 @@ COMMENT ON COLUMN Reporte.id_reporte              IS 'Identificador del reporte.
 COMMENT ON COLUMN Reporte.id_usuario              IS 'Usuario que realizó la denuncia. Parte de la llave primaria compuesta.';
 COMMENT ON COLUMN Reporte.id_publicacion          IS 'Publicación sobre la que se realizó el reporte. Parte de la llave primaria compuesta.';
 COMMENT ON COLUMN Reporte.id_usuario_publicacion  IS 'Dueño de la publicación denunciada. Forma la FK compuesta hacia Publicacion.';
-COMMENT ON COLUMN Reporte.estado                  IS 'Estado actual del reporte: Pendiente, En Revisión, Atendido o Desestimado.';
+COMMENT ON COLUMN Reporte.estado                  IS 'Estado actual del reporte: Pendiente, Atendido o Desestimado.';
 COMMENT ON COLUMN Reporte.fecha                   IS 'Fecha en que se registró el reporte.';
 COMMENT ON COLUMN Reporte.motivo                  IS 'Descripción detallada del motivo de la denuncia proporcionada por el usuario.';
 COMMENT ON COLUMN Reporte.id_administrador        IS 'Administrador asignado para revisar y resolver el reporte. NULL hasta que sea asignado.';
 
 COMMENT ON CONSTRAINT chk_estado_reporte ON Reporte IS
-'Solo se permiten los estados definidos en el dominio del negocio: Pendiente, En Revisión, Atendido, Desestimado.';
+'Solo se permiten los estados definidos en el dominio del negocio: Pendiente, Atendido, Desestimado.';
 
 -- -------------------------------------------------------------
 -- Tabla: Formulario

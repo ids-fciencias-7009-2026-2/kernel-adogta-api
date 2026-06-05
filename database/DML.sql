@@ -511,7 +511,7 @@ VALUES (2, '2026-01-20',
 
 -- Reporte 1: Carlos reporta la publicación de Simba (pub 22, user 14) — En Revisión
 INSERT INTO Reporte (id_reporte, id_usuario, id_publicacion, id_usuario_publicacion, estado, fecha, motivo, id_administrador)
-VALUES (1, 3, 22, 14, 'En Revisión', '2026-05-15',
+VALUES (1, 3, 22, 14, 'Pendiente', '2026-05-15',
 'La descripción del animal parece copiada de otra publicación. Las fotos no coinciden con la descripción de la raza. Sospecho que no es una adopción real.',
 1);
 
