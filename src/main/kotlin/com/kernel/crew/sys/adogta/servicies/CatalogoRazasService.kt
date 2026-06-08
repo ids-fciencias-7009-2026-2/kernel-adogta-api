@@ -33,8 +33,16 @@ class CatalogoRazasService() {
         val busqueda = entradaUsuario.trim().lowercase()
         if (busqueda.isEmpty()) return emptyList()
 
+        val hayCoincidenciaExacta = cacheRazas.any { 
+            it.nombreEs.lowercase() == busqueda
+        }   
+
+        if (hayCoincidenciaExacta) {
+            return emptyList()
+        }
+
         val coincidencias = cacheRazas.filter { 
-            it.nombreEs.lowercase().contains(busqueda) || it.nombreEn.lowercase().contains(busqueda)
+            it.nombreEs.lowercase().contains(busqueda)
         }
 
         return coincidencias.sortedWith(
