@@ -78,7 +78,7 @@ class RazaController {
      */
     @PostMapping
     fun agregarRaza(@RequestBody request: RazaCreateRequest): ResponseEntity<RazaResponse> {
-        logger.info("POST /api/razas - tipo={} nombre={}", request.tipo, request.nombre)
+        logger.info("POST /api/razas - tipo={} nombre={}", request.tipo, request.nombreEn)
 
         return try {
             val respuesta = razaService.crearRaza(request)
