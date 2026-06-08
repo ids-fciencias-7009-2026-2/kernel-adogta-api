@@ -4,6 +4,7 @@ import com.kernel.crew.sys.adogta.dto.request.RazaCreateRequest
 import com.kernel.crew.sys.adogta.dto.response.RazaResponse
 import com.kernel.crew.sys.adogta.repositories.RazaRepository
 import com.kernel.crew.sys.adogta.servicies.RazaService
+import com.kernel.crew.sys.adogta.servicies.CatalogoRazasService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.HttpStatus
 
 /**
  * Controlador REST que expone los endpoints relacionados con la entidad Raza.
@@ -33,6 +36,9 @@ class RazaController {
 
     @Autowired
     lateinit var razaService: RazaService
+
+    @Autowired
+    lateinit var catalogoRazasService: CatalogoRazasService
 
     /**
      * Retorna la lista completa de razas registradas en el sistema.
@@ -85,4 +91,20 @@ class RazaController {
             ResponseEntity.status(500).body(RazaResponse.error(ex.message ?: "Error interno en el microservicio LLM"))
         }
     }
+
+    /**
+     * Sugiere razas basadandose en un nombre de entrada.
+     *
+     * @param nombreEntrada El nombre de la raza que el usuario ha ingresado.
+     * @return 200 con una lista de sugerencias o 404 si no se encuentra una raza similar.
+     */
+    @PostMapping("/sugerencias")
+    fun sugerirRaza(@RequestParam("nombreEntrada") nombreEntrada: String): ResponseEntity<Any> {
+        val sugerencias = catalogoRazasService.buscarSugerencias(nombreEntrada)
+
+        logger.info("POST /api/razas/sugerencias - entrada={} sugerencias={}", nombreEntrada, sugerencias.size)
+
+        return ResponseEntity.ok(sugerencias)
+    }
+
 }
